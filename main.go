@@ -131,11 +131,11 @@ func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *tim
 
 	uid := fmt.Sprintf("roe-%s-%d-%02d%02d", TargetGroup, date.Unix(), st.Hour(), et.Hour())
 	event := cal.AddEvent(uid)
-	
+
 	// Назва та опис із посиланням
 	event.SetSummary("⚡ Відключення: " + TargetGroup)
 	event.SetDescription(fmt.Sprintf("%s. Джерело: %s", updateInfo, SourceURL))
-	
+
 	event.SetStartAt(start)
 	event.SetEndAt(end)
 	event.SetDtStampTime(time.Now())
@@ -145,12 +145,14 @@ func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *tim
 	alarm1h.SetAction(ics.ActionDisplay)
 	alarm1h.SetTrigger("-PT1H")
 	alarm1h.SetProperty(ics.ComponentPropertyDescription, "Світло вимкнуть через 1 годину")
+	alarm1h.SetProperty(ics.ComponentPropertySummary, "Відключення світла")
 
 	// Нагадування за 30 хвилин
 	alarm30m := event.AddAlarm()
 	alarm30m.SetAction(ics.ActionDisplay)
 	alarm30m.SetTrigger("-PT30M")
 	alarm30m.SetProperty(ics.ComponentPropertyDescription, "Світло вимкнуть через 30 хвилин")
+	alarm1h.SetProperty(ics.ComponentPropertySummary, "Відключення світла")
 
 	return true
 }
