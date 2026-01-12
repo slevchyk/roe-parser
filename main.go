@@ -152,7 +152,7 @@ func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *tim
 	alarm30m.SetAction(ics.ActionDisplay)
 	alarm30m.SetTrigger("-PT30M")
 	alarm30m.SetProperty(ics.ComponentPropertyDescription, "Світло вимкнуть через 30 хвилин")
-	alarm1h.SetProperty(ics.ComponentPropertySummary, "Відключення світла")
+	alarm30m.SetProperty(ics.ComponentPropertySummary, "Відключення світла")
 
 	return true
 }
