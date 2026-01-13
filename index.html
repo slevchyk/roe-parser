@@ -9,7 +9,7 @@
 
     <meta property="og:title" content="⚡ Графіки відключень Рівне">
     <meta property="og:description"
-        content="Додавай свою чергу в календар та отримуй сповіщення про світло автоматично.">
+        content="Додавай свою чергу в calendar та отримуй сповіщення про світло автоматично.">
     <meta property="og:url" content="https://slevchyk.github.io/roe-parser/">
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4CZP1X5R3K"></script>
@@ -38,7 +38,7 @@
 
                 if (platform === 'android') {
                     const webcalUrl = `webcal://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
-                    const googleUrl = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(webcalUrl)}`;
+                    const googleUrl = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(webcalUrl)}`;
 
                     btn.href = "javascript:void(0)";
                     btn.target = "_self";
@@ -59,15 +59,20 @@
         }
 
         function showAndroidInstructions() {
+            if (document.getElementById('modal-hint-el')) document.getElementById('modal-hint-el').style.display = 'block';
+            if (document.getElementById('modal-btn-el')) document.getElementById('modal-btn-el').style.display = 'block';
+
             document.getElementById('androidModal').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
 
-        function closeModalAndRedirect() {
+        function redirectFromModal() {
             if (pendingCalendarUrl) {
                 window.open(pendingCalendarUrl, '_blank');
             }
-            closeModal();
+
+            document.getElementById('modal-hint-el').style.display = 'none';
+            document.getElementById('modal-btn-el').style.display = 'none';
         }
 
         function closeModal() {
@@ -276,7 +281,6 @@
             color: #aaa;
         }
 
-        /* MODAL STYLES */
         .modal {
             display: none;
             position: fixed;
@@ -287,6 +291,7 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(3px);
+            overflow-y: auto;
         }
 
         .modal-content {
@@ -299,7 +304,7 @@
             position: relative;
             box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
             text-align: left;
-            max-height: 85vh;
+            max-height: 80vh;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -454,9 +459,10 @@
                 </ol>
             </div>
 
-            <div class="modal-hint">Поточна вкладка лишиться відкритою для перегляду інструкції.</div>
+            <div id="modal-hint-el" class="modal-hint">Поточна вкладка лишиться відкритою для перегляду інструкції.
+            </div>
 
-            <button class="btn" onclick="closeModalAndRedirect()" style="width:100%;">Вперед</button>
+            <button id="modal-btn-el" class="btn" onclick="redirectFromModal()" style="width:100%;">Вперед</button>
         </div>
     </div>
 </body>
