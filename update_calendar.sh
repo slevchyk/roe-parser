@@ -9,7 +9,7 @@ cd /root/roe-parser
 if [[ -n $(git status -s data/) ]]; then
     echo "Оновлення графіків у теці data..."
     git add data/discos-*.ics
-    git commit -m "Auto-update all groups in data folder: $(date +'%d.%m.%Y %H:%M')"
+    git commit -m "Auto-update: $(date +'%d.%m.%Y %H:%M')"
     git push origin main
     echo "Всі файли відправлено на GitHub!"
 else
