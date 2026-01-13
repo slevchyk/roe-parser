@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Графіки відключень Рівне</title>
+    <style>
+        body {
+            font-family: -apple-system, sans-serif;
+            background: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            color: #333;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: block;
+            padding: 12px;
+            text-align: center;
+            background: #ffcc00;
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #e6b800;
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>⚡ Графіки РОЕ</h1>
+        <p>Натисніть на свою чергу, щоб додати розклад у календар iPhone/Google</p>
+
+        <div class="grid">
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.1.ics" class="btn">Черга 1.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.2.ics" class="btn">Черга 1.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.1.ics" class="btn">Черга 2.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.2.ics" class="btn">Черга 2.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.1.ics" class="btn">Черга 3.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.2.ics" class="btn">Черга 3.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.1.ics" class="btn">Черга 4.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.2.ics" class="btn">Черга 4.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.1.ics" class="btn">Черга 5.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.2.ics" class="btn">Черга 5.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.1.ics" class="btn">Черга 6.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.2.ics" class="btn">Черга 6.2</a>
+        </div>
+
+        <footer>Дані оновлюються автоматично кожну годину</footer>
+    </div>
+</body>
+
+</html>
