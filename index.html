@@ -26,6 +26,8 @@
             });
         }
 
+        let pendingCalendarUrl = ""; // Змінна для збереження посилання
+
         // Функція перемикання платформ
         function setPlatform(platform) {
             document.querySelectorAll('.switch-btn').forEach(b => b.classList.remove('active'));
@@ -36,15 +38,42 @@
                 const queue = btn.getAttribute('data-queue');
 
                 if (platform === 'android') {
-                    // Формуємо посилання через webcal протокол всередині CID                    
                     const webcalUrl = `webcal://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
-                    btn.href = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(webcalUrl)}`;
+                    const googleUrl = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(webcalUrl)}`;
+
+                    btn.href = "javascript:void(0)";
+                    btn.target = "_self"; // Скидаємо target, бо перехід буде через скрипт
+
+                    btn.onclick = function () {
+                        trackQueueClick(queue);
+                        pendingCalendarUrl = googleUrl; // Зберігаємо лінк
+                        showAndroidInstructions();     // Показуємо модалку
+                    };
                 } else {
                     btn.href = `webcal://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
+                    btn.target = "_self";
+                    btn.onclick = function () {
+                        trackQueueClick(queue);
+                    };
                 }
             });
 
             gtag('event', 'switch_platform', { 'platform_type': platform });
+        }
+
+        function showAndroidInstructions() {
+            document.getElementById('androidModal').style.display = 'block';
+        }
+
+        function closeModalAndRedirect() {
+            if (pendingCalendarUrl) {
+                window.open(pendingCalendarUrl, '_blank'); // Відкриваємо календар у новій вкладці
+            }
+            document.getElementById('androidModal').style.display = 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('androidModal').style.display = 'none';
         }
     </script>
 
@@ -93,7 +122,6 @@
             line-height: 1.4;
         }
 
-        /* Стилі перемикача платформ */
         .platform-switch {
             display: flex;
             background: #eee;
@@ -247,6 +275,67 @@
             color: #aaa;
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 25px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 85%;
+            position: relative;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            text-align: left;
+        }
+
+        .modal-content h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            color: var(--text-main);
+        }
+
+        .modal-step {
+            background: #f0f7ff;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .modal-step p {
+            margin: 5px 0 0 0;
+            line-height: 1.4;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .modal-hint {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #aaa;
+            line-height: 1.1;
+        }
+
         @media (max-width: 380px) {
             .charity-grid {
                 grid-template-columns: 1fr;
@@ -257,7 +346,7 @@
 
 <body>
     <div class="container">
-        <h1>⚡ Графіки РОЕ</h1>
+        <h1>⚡ Графіки планових відключень РОЕ</h1>
         <p class="subtitle">Оберіть платформу та свою чергу для автоматичного розкладу:</p>
 
         <div class="platform-switch">
@@ -325,8 +414,45 @@
 
         <div class="system-footer">
             Дані оновлюються автоматично.<br>
-            Джерело: <a href="https://www.roe.vsei.ua/" target="_blank"
+            Джерело: <a href="https://www.roe.vsei.ua/disconnections" target="_blank"
                 style="color: inherit; text-decoration: underline;">Рівнеобленерго</a>
+        </div>
+    </div>
+
+    <div id="androidModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2>Налаштування Google / Android</h2>
+            <p style="font-size: 0.9rem; margin-bottom: 10px;">Щоб бачити його у додатку на телефоні після того як
+                додасте в свій Google акаунт, виконайте наступні кроки:
+            </p>
+
+            <div class="modal-step">
+                <strong>Крок 1: Увімкніть синхронізацію</strong>
+                <p>Перейдіть на сторінку <a href="https://calendar.google.com/calendar/syncselect"
+                        target="_blank">синхронізації</a>, поставте галочку біля щойно доданого календаря "Відключення
+                    світла: група ..." та натисніть "Зберегти".</p>
+            </div>
+
+            <div class="modal-step">
+                <strong>Крок 2: Активуйте у додатку</strong>
+                <p>Тепер потрібно сказати самому додатку на Android, що цей календар треба показувати:</p>
+                <ol>
+                    <li>Відкрийте додаток Google Календар на Android.</li>
+                    <li>Натисніть на іконку "сендвіч" (три лінії) зліва зверху — відкриється бічна панель.</li>
+                    <li>Прокрутіть вниз і натисніть "Налаштування".</li>
+                    <li>Знайдіть у списку ваш акаунт (наприклад, youraccount@gmail.com).</li>
+                    <li>Під акаунтом натисніть "Показати більше".</li>
+                    <li>Ви побачите календар "Відключення світла...". Натисніть на нього.</li>
+                    <li>Увімкніть перемикач "Синхронізація" (він має стати синім).</li>
+                </ol>
+            </div>
+
+            <div class="modal-hint">Після натискання Вперед ви перейдете на сторінку додавання календаря, поточна
+                вкладка лишиться відкритою, щоб ви могли повернутись до інструкції.</div>
+
+            <button class="btn" onclick="closeModalAndRedirect()"
+                style="margin-top:15px; width:100%; border:none; cursor:pointer;">Вперед</button>
         </div>
     </div>
 </body>
