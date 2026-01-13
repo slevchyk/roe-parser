@@ -26,9 +26,8 @@
             });
         }
 
-        let pendingCalendarUrl = ""; // Змінна для збереження посилання
+        let pendingCalendarUrl = "";
 
-        // Функція перемикання платформ
         function setPlatform(platform) {
             document.querySelectorAll('.switch-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(platform + '-btn').classList.add('active');
@@ -39,15 +38,14 @@
 
                 if (platform === 'android') {
                     const webcalUrl = `webcal://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
-                    const googleUrl = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(webcalUrl)}`;
+                    const googleUrl = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(webcalUrl)}`;
 
                     btn.href = "javascript:void(0)";
-                    btn.target = "_self"; // Скидаємо target, бо перехід буде через скрипт
-
+                    btn.target = "_self";
                     btn.onclick = function () {
                         trackQueueClick(queue);
-                        pendingCalendarUrl = googleUrl; // Зберігаємо лінк
-                        showAndroidInstructions();     // Показуємо модалку
+                        pendingCalendarUrl = googleUrl;
+                        showAndroidInstructions();
                     };
                 } else {
                     btn.href = `webcal://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
@@ -57,23 +55,24 @@
                     };
                 }
             });
-
             gtag('event', 'switch_platform', { 'platform_type': platform });
         }
 
         function showAndroidInstructions() {
             document.getElementById('androidModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModalAndRedirect() {
             if (pendingCalendarUrl) {
-                window.open(pendingCalendarUrl, '_blank'); // Відкриваємо календар у новій вкладці
+                window.open(pendingCalendarUrl, '_blank');
             }
-            document.getElementById('androidModal').style.display = 'none';
+            closeModal();
         }
 
         function closeModal() {
             document.getElementById('androidModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
     </script>
 
@@ -167,6 +166,7 @@
             font-weight: 700;
             transition: transform 0.1s, background 0.2s;
             font-size: 0.9rem;
+            border: none;
         }
 
         .btn:active {
@@ -175,6 +175,7 @@
 
         .btn:hover {
             background: #e6b800;
+            cursor: pointer;
         }
 
         .charity-section {
@@ -275,6 +276,7 @@
             color: #aaa;
         }
 
+        /* MODAL STYLES */
         .modal {
             display: none;
             position: fixed;
@@ -289,7 +291,7 @@
 
         .modal-content {
             background-color: white;
-            margin: 10% auto;
+            margin: 5% auto;
             padding: 25px;
             border-radius: 20px;
             max-width: 400px;
@@ -297,6 +299,9 @@
             position: relative;
             box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
             text-align: left;
+            max-height: 85vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal-content h2 {
@@ -310,8 +315,13 @@
             padding: 12px;
             border-radius: 10px;
             margin: 10px 0;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             border-left: 4px solid var(--secondary-color);
+        }
+
+        .modal-step ol {
+            padding-left: 20px;
+            margin: 8px 0;
         }
 
         .modal-step p {
@@ -329,11 +339,11 @@
         }
 
         .modal-hint {
-            margin-top: 25px;
+            margin: 20px 0 15px 0;
             text-align: center;
             font-size: 0.7rem;
             color: #aaa;
-            line-height: 1.1;
+            line-height: 1.2;
         }
 
         @media (max-width: 380px) {
@@ -355,47 +365,45 @@
         </div>
 
         <div class="grid">
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.1.ics" class="btn queue-btn" data-queue="1.1"
-                onclick="trackQueueClick('1.1')">Черга 1.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.2.ics" class="btn queue-btn" data-queue="1.2"
-                onclick="trackQueueClick('1.2')">Черга 1.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.1.ics" class="btn queue-btn" data-queue="2.1"
-                onclick="trackQueueClick('2.1')">Черга 2.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.2.ics" class="btn queue-btn" data-queue="2.2"
-                onclick="trackQueueClick('2.2')">Черга 2.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.1.ics" class="btn queue-btn" data-queue="3.1"
-                onclick="trackQueueClick('3.1')">Черга 3.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.2.ics" class="btn queue-btn" data-queue="3.2"
-                onclick="trackQueueClick('3.2')">Черга 3.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.1.ics" class="btn queue-btn" data-queue="4.1"
-                onclick="trackQueueClick('4.1')">Черга 4.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.2.ics" class="btn queue-btn" data-queue="4.2"
-                onclick="trackQueueClick('4.2')">Черга 4.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.1.ics" class="btn queue-btn" data-queue="5.1"
-                onclick="trackQueueClick('5.1')">Черга 5.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.2.ics" class="btn queue-btn" data-queue="5.2"
-                onclick="trackQueueClick('5.2')">Черга 5.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.1.ics" class="btn queue-btn" data-queue="6.1"
-                onclick="trackQueueClick('6.1')">Черга 6.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.2.ics" class="btn queue-btn" data-queue="6.2"
-                onclick="trackQueueClick('6.2')">Черга 6.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.1.ics" class="btn queue-btn"
+                data-queue="1.1">Черга 1.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.2.ics" class="btn queue-btn"
+                data-queue="1.2">Черга 1.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.1.ics" class="btn queue-btn"
+                data-queue="2.1">Черга 2.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.2.ics" class="btn queue-btn"
+                data-queue="2.2">Черга 2.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.1.ics" class="btn queue-btn"
+                data-queue="3.1">Черга 3.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.2.ics" class="btn queue-btn"
+                data-queue="3.2">Черга 3.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.1.ics" class="btn queue-btn"
+                data-queue="4.1">Черга 4.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.2.ics" class="btn queue-btn"
+                data-queue="4.2">Черга 4.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.1.ics" class="btn queue-btn"
+                data-queue="5.1">Черга 5.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.2.ics" class="btn queue-btn"
+                data-queue="5.2">Черга 5.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.1.ics" class="btn queue-btn"
+                data-queue="6.1">Черга 6.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.2.ics" class="btn queue-btn"
+                data-queue="6.2">Черга 6.2</a>
         </div>
 
         <div class="charity-section">
             <p class="charity-text">Допоможи силам оборони України повернути світло:</p>
             <div class="charity-grid">
                 <a href="https://payment-page.charge-auth.com/charity/comebackalive/LAQb27N" class="charity-item"
-                    onclick="trackQueueClick('Donation_ComeBackAlive')" target="_blank">
+                    target="_blank">
                     <img src="assets/img/come_back_alive.png" alt="ПЖ" class="charity-logo">
                     <span class="charity-link">ПЖ</span>
                 </a>
-                <a href="https://www.sternenkofund.org/donate" class="charity-item"
-                    onclick="trackQueueClick('Donation_Sternenko')" target="_blank">
+                <a href="https://www.sternenkofund.org/donate" class="charity-item" target="_blank">
                     <img src="assets/img/sternenko.png" alt="Стерненко" class="charity-logo">
                     <span class="charity-link">Дрони</span>
                 </a>
-                <a href="https://prytulafoundation.org/donation" class="charity-item"
-                    onclick="trackQueueClick('Donation_Prytula')" target="_blank">
+                <a href="https://prytulafoundation.org/donation" class="charity-item" target="_blank">
                     <img src="assets/img/prytula.png" alt="Притула" class="charity-logo">
                     <span class="charity-link">Притула</span>
                 </a>
@@ -406,9 +414,9 @@
             <div class="share-label">Поділитися сервісом з сусідом:</div>
             <div class="share-grid">
                 <a href="https://t.me/share/url?url=https://slevchyk.github.io/roe-parser/&text=Графіки відключень світла у Рівному для календаря ⚡"
-                    target="_blank" class="share-btn tg" onclick="trackQueueClick('Share_Telegram')">Telegram</a>
+                    target="_blank" class="share-btn tg">Telegram</a>
                 <a href="viber://forward?text=Актуальні графіки відключень у Рівному: https://slevchyk.github.io/roe-parser/"
-                    target="_blank" class="share-btn vb" onclick="trackQueueClick('Share_Viber')">Viber</a>
+                    target="_blank" class="share-btn vb">Viber</a>
             </div>
         </div>
 
@@ -422,10 +430,8 @@
     <div id="androidModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2>Налаштування Google / Android</h2>
-            <p style="font-size: 0.9rem; margin-bottom: 10px;">Щоб бачити його у додатку на телефоні після того як
-                додасте в свій Google акаунт, виконайте наступні кроки:
-            </p>
+            <h2>Налаштування Android</h2>
+            <p style="font-size: 0.85rem; margin-bottom: 10px;">Щоб бачити графік у додатку на телефоні:</p>
 
             <div class="modal-step">
                 <strong>Крок 1: Увімкніть синхронізацію</strong>
@@ -448,11 +454,9 @@
                 </ol>
             </div>
 
-            <div class="modal-hint">Після натискання Вперед ви перейдете на сторінку додавання календаря, поточна
-                вкладка лишиться відкритою, щоб ви могли повернутись до інструкції.</div>
+            <div class="modal-hint">Поточна вкладка лишиться відкритою для перегляду інструкції.</div>
 
-            <button class="btn" onclick="closeModalAndRedirect()"
-                style="margin-top:15px; width:100%; border:none; cursor:pointer;">Вперед</button>
+            <button class="btn" onclick="closeModalAndRedirect()" style="width:100%;">Вперед</button>
         </div>
     </div>
 </body>
