@@ -24,7 +24,30 @@
                 'content_type': 'queue_button',
                 'item_id': queueNumber
             });
-            console.log('Подія відправлена для: ' + queueNumber);
+        }
+
+        // Функція перемикання платформ
+        function setPlatform(platform) {
+            // Оновлюємо кнопки перемикача
+            document.querySelectorAll('.switch-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(platform + '-btn').classList.add('active');
+
+            // Оновлюємо посилання для всіх кнопок черг
+            const buttons = document.querySelectorAll('.queue-btn');
+            buttons.forEach(btn => {
+                const queue = btn.getAttribute('data-queue');
+                const rawUrl = `slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
+
+                if (platform === 'android') {
+                    // Формат для Google Calendar (Web Import)
+                    btn.href = `https://www.google.com/calendar/render?cid=https://${rawUrl}`;
+                } else {
+                    // Формат для Apple Calendar (WebCal)
+                    btn.href = `webcal://${rawUrl}`;
+                }
+            });
+
+            gtag('event', 'switch_platform', { 'platform_type': platform });
         }
     </script>
 
@@ -68,9 +91,37 @@
         .subtitle {
             text-align: center;
             color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 25px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
             line-height: 1.4;
+        }
+
+        /* Стилі перемикача платформ */
+        .platform-switch {
+            display: flex;
+            background: #eee;
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .switch-btn {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: transparent;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+
+        .switch-btn.active {
+            background: white;
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .grid {
@@ -110,10 +161,10 @@
         }
 
         .charity-text {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text-main);
             line-height: 1.5;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: 600;
         }
 
@@ -127,45 +178,42 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            padding: 12px 5px;
+            padding: 10px 5px;
             background: white;
             border: 1px solid #eee;
             border-radius: 12px;
             text-decoration: none;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.2s;
         }
 
         .charity-item:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border-color: var(--primary-color);
         }
 
         .charity-logo {
-            height: 35px;
-            margin-bottom: 8px;
+            height: 30px;
+            margin-bottom: 5px;
         }
 
         .charity-link {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--secondary-color);
             font-weight: bold;
             text-transform: uppercase;
         }
 
-        /* Секція Поділитися під донатами */
         .share-section {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            padding-top: 10px;
+            padding-top: 15px;
             border-top: 1px solid #eee;
         }
 
         .share-label {
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
         }
 
@@ -183,9 +231,8 @@
             color: white;
             text-decoration: none;
             border-radius: 8px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            transition: opacity 0.2s;
         }
 
         .share-btn.tg {
@@ -196,14 +243,10 @@
             background-color: var(--vb-color);
         }
 
-        .share-btn:hover {
-            opacity: 0.9;
-        }
-
         .system-footer {
             margin-top: 25px;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #aaa;
         }
 
@@ -217,73 +260,74 @@
 
 <body>
     <div class="container">
-        <h1>⚡ Графіки планових відключень РОЕ</h1>
-        <p class="subtitle">Оберіть свою чергу, щоб додати автоматичний розклад у календар вашого смартфона</p>
+        <h1>⚡ Графіки РОЕ</h1>
+        <p class="subtitle">Оберіть платформу та свою чергу для автоматичного розкладу:</p>
+
+        <div class="platform-switch">
+            <button id="ios-btn" class="switch-btn active" onclick="setPlatform('ios')">Apple / iOS</button>
+            <button id="android-btn" class="switch-btn" onclick="setPlatform('android')">Android / Google</button>
+        </div>
 
         <div class="grid">
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.1.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.1.ics" class="btn queue-btn" data-queue="1.1"
                 onclick="trackQueueClick('1.1')">Черга 1.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.2.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.2.ics" class="btn queue-btn" data-queue="1.2"
                 onclick="trackQueueClick('1.2')">Черга 1.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.1.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.1.ics" class="btn queue-btn" data-queue="2.1"
                 onclick="trackQueueClick('2.1')">Черга 2.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.2.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.2.ics" class="btn queue-btn" data-queue="2.2"
                 onclick="trackQueueClick('2.2')">Черга 2.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.1.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.1.ics" class="btn queue-btn" data-queue="3.1"
                 onclick="trackQueueClick('3.1')">Черга 3.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.2.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.2.ics" class="btn queue-btn" data-queue="3.2"
                 onclick="trackQueueClick('3.2')">Черга 3.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.1.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.1.ics" class="btn queue-btn" data-queue="4.1"
                 onclick="trackQueueClick('4.1')">Черга 4.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.2.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.2.ics" class="btn queue-btn" data-queue="4.2"
                 onclick="trackQueueClick('4.2')">Черга 4.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.1.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.1.ics" class="btn queue-btn" data-queue="5.1"
                 onclick="trackQueueClick('5.1')">Черга 5.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.2.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.2.ics" class="btn queue-btn" data-queue="5.2"
                 onclick="trackQueueClick('5.2')">Черга 5.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.1.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.1.ics" class="btn queue-btn" data-queue="6.1"
                 onclick="trackQueueClick('6.1')">Черга 6.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.2.ics" class="btn"
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.2.ics" class="btn queue-btn" data-queue="6.2"
                 onclick="trackQueueClick('6.2')">Черга 6.2</a>
         </div>
 
         <div class="charity-section">
-            <p class="charity-text">Поки ви очікуєте відключень, ваша гривня може значно скоротити ці інтервали:</p>
+            <p class="charity-text">Допоможи ЗСУ повернути світло:</p>
             <div class="charity-grid">
                 <a href="https://payment-page.charge-auth.com/charity/comebackalive/LAQb27N" class="charity-item"
                     onclick="trackQueueClick('Donation_ComeBackAlive')" target="_blank">
                     <img src="assets/img/come_back_alive.png" alt="ПЖ" class="charity-logo">
-                    <span class="charity-link">Підтримати ПЖ</span>
+                    <span class="charity-link">ПЖ</span>
                 </a>
                 <a href="https://www.sternenkofund.org/donate" class="charity-item"
                     onclick="trackQueueClick('Donation_Sternenko')" target="_blank">
                     <img src="assets/img/sternenko.png" alt="Стерненко" class="charity-logo">
-                    <span class="charity-link">На дрони</span>
+                    <span class="charity-link">Дрони</span>
                 </a>
                 <a href="https://prytulafoundation.org/donation" class="charity-item"
                     onclick="trackQueueClick('Donation_Prytula')" target="_blank">
                     <img src="assets/img/prytula.png" alt="Притула" class="charity-logo">
-                    <span class="charity-link">Фонд Притули</span>
+                    <span class="charity-link">Притула</span>
                 </a>
             </div>
         </div>
 
         <div class="share-section">
-            <div class="share-label">Надіслати графік сусідам:</div>
+            <div class="share-label">Поділитися сервісом:</div>
             <div class="share-grid">
-                <a href="https://t.me/share/url?url=https://slevchyk.github.io/roe-parser/&text=Актуальні графіки відключень світла у Рівному для календаря ⚡"
-                    target="_blank" class="share-btn tg" onclick="trackQueueClick('Share_Telegram')">
-                    Telegram
-                </a>
+                <a href="https://t.me/share/url?url=https://slevchyk.github.io/roe-parser/&text=Графіки відключень світла у Рівному для календаря ⚡"
+                    target="_blank" class="share-btn tg" onclick="trackQueueClick('Share_Telegram')">Telegram</a>
                 <a href="viber://forward?text=Актуальні графіки відключень у Рівному: https://slevchyk.github.io/roe-parser/"
-                    target="_blank" class="share-btn vb" onclick="trackQueueClick('Share_Viber')">
-                    Viber
-                </a>
+                    target="_blank" class="share-btn vb" onclick="trackQueueClick('Share_Viber')">Viber</a>
             </div>
         </div>
 
         <div class="system-footer">
-            Дані оновлюються автоматично кожну годину.<br>
+            Дані оновлюються автоматично.<br>
             Джерело: <a href="https://www.roe.vsei.ua/" target="_blank"
                 style="color: inherit; text-decoration: underline;">Рівнеобленерго</a>
         </div>
