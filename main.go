@@ -148,7 +148,7 @@ func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *tim
 	event := cal.AddEvent(uid)
 
 	event.SetSummary("⚡ Відключення: " + groupID)
-	event.SetDescription(fmt.Sprintf("%s.\\nДжерело: %s", updateInfo, SourceURL))
+	event.SetDescription(fmt.Sprintf("%s.\nДжерело: %s", updateInfo, SourceURL))
 	event.SetStartAt(start)
 	event.SetEndAt(end)
 	event.SetDtStampTime(time.Now())
