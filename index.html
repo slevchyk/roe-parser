@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="uk">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Графіки відключень Рівне</title>
+    <link rel="icon" type="image/png" href="assets/img/logo.png">
     <style>
         :root {
             --primary-color: #ffcc00;
@@ -14,50 +16,67 @@
             --text-muted: #666;
         }
 
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg-color); 
-            display: flex; 
-            justify-content: center; 
-            padding: 20px; 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
             margin: 0;
         }
 
-        .container { 
-            background: var(--card-bg); 
-            padding: 25px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            max-width: 450px; 
-            width: 100%; 
+        .container {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            max-width: 450px;
+            width: 100%;
         }
 
-        h1 { font-size: 1.6rem; text-align: center; color: var(--text-main); margin-bottom: 10px; }
-        .subtitle { text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; line-height: 1.4; }
+        h1 {
+            font-size: 1.6rem;
+            text-align: center;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
 
         /* Сітка черг */
-        .grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 12px; 
-            margin-bottom: 30px; 
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 30px;
         }
 
-        .btn { 
-            display: block; 
-            padding: 14px; 
-            text-align: center; 
-            background: var(--primary-color); 
-            color: #000; 
-            text-decoration: none; 
-            border-radius: 12px; 
-            font-weight: 700; 
+        .btn {
+            display: block;
+            padding: 14px;
+            text-align: center;
+            background: var(--primary-color);
+            color: #000;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
             transition: transform 0.1s, background 0.2s;
             font-size: 0.9rem;
         }
 
-        .btn:active { transform: scale(0.97); }
-        .btn:hover { background: #e6b800; }
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn:hover {
+            background: #e6b800;
+        }
 
         /* Благодійна секція */
         .charity-section {
@@ -98,7 +117,7 @@
 
         .charity-item:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border-color: var(--primary-color);
         }
 
@@ -126,17 +145,26 @@
         }
 
         @media (max-width: 380px) {
-            .charity-grid { grid-template-columns: 1fr; }
-            .charity-logo { height: 45px; }
-            .charity-link { font-size: 0.8rem; }
+            .charity-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charity-logo {
+                height: 45px;
+            }
+
+            .charity-link {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>⚡ Графіки РОЕ</h1>
         <p class="subtitle">Оберіть свою чергу, щоб додати автоматичний розклад у календар вашого смартфона</p>
-        
+
         <div class="grid">
             <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.1.ics" class="btn">Черга 1.1</a>
             <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.2.ics" class="btn">Черга 1.2</a>
@@ -157,18 +185,19 @@
                 Поки ви очікуєте відключень, ваша гривня може значно скоротити ці інтервали:
             </p>
             <div class="charity-grid">
-                <a href="https://payment-page.charge-auth.com/charity/comebackalive/LAQb27N" class="charity-item" target="_blank">
-                    <img src="charity_logo.png" alt="Повернись Живим" class="charity-logo">
+                <a href="https://payment-page.charge-auth.com/charity/comebackalive/LAQb27N" class="charity-item"
+                    target="_blank">
+                    <img src="assets/img/come_back_alive.png" alt="Повернись Живим" class="charity-logo">
                     <span class="charity-link">Підтримати ПЖ</span>
                 </a>
 
                 <a href="https://www.sternenkofund.org/donate" class="charity-item" target="_blank">
-                    <img src="sternenko_logo.png" alt="Спільнота Стерненка" class="charity-logo">
+                    <img src="assets/img/sternenko.png" alt="Спільнота Стерненка" class="charity-logo">
                     <span class="charity-link">Донат на дрони</span>
                 </a>
 
                 <a href="https://prytulafoundation.org/donation" class="charity-item" target="_blank">
-                    <img src="prytula_logo.png" alt="Фонд Притули" class="charity-logo">
+                    <img src="assets/img/prytula.png" alt="Фонд Притули" class="charity-logo">
                     <span class="charity-link">Фонд Притули</span>
                 </a>
             </div>
@@ -180,4 +209,5 @@
         </div>
     </div>
 </body>
+
 </html>
