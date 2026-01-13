@@ -34,18 +34,11 @@
             const buttons = document.querySelectorAll('.queue-btn');
             buttons.forEach(btn => {
                 const queue = btn.getAttribute('data-queue');
-                // Базове посилання
-                const rawUrl = `https://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
 
                 if (platform === 'android') {
-                    // ПОДВІЙНЕ кодування для надійності в Google Chrome на Android
-                    const firstEncode = encodeURIComponent(rawUrl);
-                    const secondEncode = encodeURIComponent(firstEncode);
-
-                    // Використовуємо повний шлях до налаштувань
-                    btn.href = `https://calendar.google.com/calendar/u/0/r/settings/addbyurl?url=${rawUrl}`;
-
-                    // Якщо перший варіант не спрацює, спробуйте замінити на secondEncode вище
+                    // Формуємо посилання через webcal протокол всередині CID                    
+                    const webcalUrl = `webcal://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
+                    btn.href = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(webcalUrl)}`;
                 } else {
                     btn.href = `webcal://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
                 }
@@ -269,7 +262,7 @@
 
         <div class="platform-switch">
             <button id="ios-btn" class="switch-btn active" onclick="setPlatform('ios')">Apple / iOS</button>
-            <button id="android-btn" class="switch-btn" onclick="setPlatform('android')">Android / Google</button>
+            <button id="android-btn" class="switch-btn" onclick="setPlatform('android')">Google / Android</button>
         </div>
 
         <div class="grid">
@@ -300,7 +293,7 @@
         </div>
 
         <div class="charity-section">
-            <p class="charity-text">Допоможи ЗСУ повернути світло:</p>
+            <p class="charity-text">Допоможи силам оборони України повернути світло:</p>
             <div class="charity-grid">
                 <a href="https://payment-page.charge-auth.com/charity/comebackalive/LAQb27N" class="charity-item"
                     onclick="trackQueueClick('Donation_ComeBackAlive')" target="_blank">
@@ -321,7 +314,7 @@
         </div>
 
         <div class="share-section">
-            <div class="share-label">Поділитися сервісом:</div>
+            <div class="share-label">Поділитися сервісом з сусідом:</div>
             <div class="share-grid">
                 <a href="https://t.me/share/url?url=https://slevchyk.github.io/roe-parser/&text=Графіки відключень світла у Рівному для календаря ⚡"
                     target="_blank" class="share-btn tg" onclick="trackQueueClick('Share_Telegram')">Telegram</a>
