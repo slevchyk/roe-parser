@@ -6,26 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Графіки відключень Рівне</title>
     <link rel="icon" type="image/png" href="assets/img/logo.png">
-    <!-- Google tag (gtag.js) -->
+
+    <meta property="og:title" content="⚡ Графіки відключень Рівне">
+    <meta property="og:description"
+        content="Додавай свою чергу в календар та отримуй сповіщення про світло автоматично.">
+    <meta property="og:url" content="https://slevchyk.github.io/roe-parser/">
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4CZP1X5R3K"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-4CZP1X5R3K');
 
-        // Спеціальна функція для відстеження кліків
         function trackQueueClick(queueNumber) {
             gtag('event', 'select_content', {
                 'content_type': 'queue_button',
                 'item_id': queueNumber
             });
-            // Додатково можна вивести в консоль для тесту
             console.log('Подія відправлена для: ' + queueNumber);
         }
     </script>
-    <!-- End Google Tag-->
+
     <style>
         :root {
             --primary-color: #ffcc00;
@@ -34,6 +36,8 @@
             --card-bg: #ffffff;
             --text-main: #333;
             --text-muted: #666;
+            --tg-color: #229ED9;
+            --vb-color: #7360f2;
         }
 
         body {
@@ -69,12 +73,11 @@
             line-height: 1.4;
         }
 
-        /* Сітка черг */
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .btn {
@@ -98,13 +101,12 @@
             background: #e6b800;
         }
 
-        /* Благодійна секція */
         .charity-section {
-            margin-top: 10px;
             padding: 20px;
             background: #fffdf5;
             border-radius: 15px;
             text-align: center;
+            margin-bottom: 20px;
         }
 
         .charity-text {
@@ -142,9 +144,6 @@
 
         .charity-logo {
             height: 35px;
-            width: auto;
-            max-width: 90%;
-            object-fit: contain;
             margin-bottom: 8px;
         }
 
@@ -152,8 +151,53 @@
             font-size: 0.65rem;
             color: var(--secondary-color);
             font-weight: bold;
-            line-height: 1.1;
             text-transform: uppercase;
+        }
+
+        /* Секція Поділитися під донатами */
+        .share-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .share-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .share-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .share-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .share-btn.tg {
+            background-color: var(--tg-color);
+        }
+
+        .share-btn.vb {
+            background-color: var(--vb-color);
+        }
+
+        .share-btn:hover {
+            opacity: 0.9;
         }
 
         .system-footer {
@@ -166,14 +210,6 @@
         @media (max-width: 380px) {
             .charity-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .charity-logo {
-                height: 45px;
-            }
-
-            .charity-link {
-                font-size: 0.8rem;
             }
         }
     </style>
@@ -212,26 +248,36 @@
         </div>
 
         <div class="charity-section">
-            <p class="charity-text">
-                Поки ви очікуєте відключень, ваша гривня може значно скоротити ці інтервали:
-            </p>
+            <p class="charity-text">Поки ви очікуєте відключень, ваша гривня може значно скоротити ці інтервали:</p>
             <div class="charity-grid">
                 <a href="https://payment-page.charge-auth.com/charity/comebackalive/LAQb27N" class="charity-item"
                     onclick="trackQueueClick('Donation_ComeBackAlive')" target="_blank">
-                    <img src="assets/img/come_back_alive.png" alt="Повернись Живим" class="charity-logo">
+                    <img src="assets/img/come_back_alive.png" alt="ПЖ" class="charity-logo">
                     <span class="charity-link">Підтримати ПЖ</span>
                 </a>
-
                 <a href="https://www.sternenkofund.org/donate" class="charity-item"
                     onclick="trackQueueClick('Donation_Sternenko')" target="_blank">
-                    <img src="assets/img/sternenko.png" alt="Спільнота Стерненка" class="charity-logo">
-                    <span class="charity-link">Донат на дрони</span>
+                    <img src="assets/img/sternenko.png" alt="Стерненко" class="charity-logo">
+                    <span class="charity-link">На дрони</span>
                 </a>
-
                 <a href="https://prytulafoundation.org/donation" class="charity-item"
                     onclick="trackQueueClick('Donation_Prytula')" target="_blank">
-                    <img src="assets/img/prytula.png" alt="Фонд Притули" class="charity-logo">
+                    <img src="assets/img/prytula.png" alt="Притула" class="charity-logo">
                     <span class="charity-link">Фонд Притули</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="share-section">
+            <div class="share-label">Надіслати графік сусідам:</div>
+            <div class="share-grid">
+                <a href="https://t.me/share/url?url=https://slevchyk.github.io/roe-parser/&text=Актуальні графіки відключень світла у Рівному для календаря ⚡"
+                    target="_blank" class="share-btn tg" onclick="trackQueueClick('Share_Telegram')">
+                    Telegram
+                </a>
+                <a href="viber://forward?text=Актуальні графіки відключень у Рівному: https://slevchyk.github.io/roe-parser/"
+                    target="_blank" class="share-btn vb" onclick="trackQueueClick('Share_Viber')">
+                    Viber
                 </a>
             </div>
         </div>
