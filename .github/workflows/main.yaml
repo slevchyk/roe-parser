@@ -1,5 +1,9 @@
 name: Manual Update (Backup)
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 on:  
   workflow_dispatch: # Залишили тільки ручний запуск кнопкою
 
