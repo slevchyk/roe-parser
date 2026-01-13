@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"roe-parser/.github/models"
+	"roe-parser/models"
 
 	"github.com/PuerkitoBio/goquery"
 	ics "github.com/arran4/golang-ical"
