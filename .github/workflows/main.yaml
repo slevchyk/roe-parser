@@ -1,7 +1,7 @@
 name: Manual Update (Backup)
 
 concurrency:
-  group: "pages"
+  group: 'pages-${{ github.ref }}'
   cancel-in-progress: true
 
 on:  
