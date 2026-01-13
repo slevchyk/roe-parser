@@ -28,22 +28,26 @@
 
         // Функція перемикання платформ
         function setPlatform(platform) {
-            // Оновлюємо кнопки перемикача
             document.querySelectorAll('.switch-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(platform + '-btn').classList.add('active');
 
-            // Оновлюємо посилання для всіх кнопок черг
             const buttons = document.querySelectorAll('.queue-btn');
             buttons.forEach(btn => {
                 const queue = btn.getAttribute('data-queue');
-                const rawUrl = `slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
+                // Базове посилання
+                const rawUrl = `https://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
 
                 if (platform === 'android') {
-                    // Формат для Google Calendar (Web Import)
-                    btn.href = `https://www.google.com/calendar/render?cid=https://${rawUrl}`;
+                    // ПОДВІЙНЕ кодування для надійності в Google Chrome на Android
+                    const firstEncode = encodeURIComponent(rawUrl);
+                    const secondEncode = encodeURIComponent(firstEncode);
+
+                    // Використовуємо повний шлях до налаштувань
+                    btn.href = `https://calendar.google.com/calendar/u/0/r/settings/addbyurl?url=${rawUrl}`;
+
+                    // Якщо перший варіант не спрацює, спробуйте замінити на secondEncode вище
                 } else {
-                    // Формат для Apple Calendar (WebCal)
-                    btn.href = `webcal://${rawUrl}`;
+                    btn.href = `webcal://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
                 }
             });
 

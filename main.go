@@ -53,7 +53,7 @@ func main() {
 
 	for _, id := range groupIDs {
 		cal := ics.NewCalendar()
-		cal.SetMethod(ics.MethodPublish)
+		// cal.SetMethod(ics.MethodPublish)
 		cal.SetProductId("-//ROE-Parser//UA")
 		groups[id] = &models.WorkGroup{
 			ID:          id,
@@ -155,7 +155,7 @@ func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *tim
 
 	// Нагадування
 	alarms := []models.Alarm{
-		{Trigger: "-PT1H", Description: "1 годину"},
+		//{Trigger: "-PT1H", Description: "1 годину"},
 		{Trigger: "-PT30M", Description: "30 хвилин"},
 	}
 
