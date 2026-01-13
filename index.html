@@ -6,6 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Графіки відключень Рівне</title>
     <link rel="icon" type="image/png" href="assets/img/logo.png">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4CZP1X5R3K"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-4CZP1X5R3K');
+
+        // Спеціальна функція для відстеження кліків
+        function trackQueueClick(queueNumber) {
+            gtag('event', 'select_content', {
+                'content_type': 'queue_button',
+                'item_id': queueNumber
+            });
+            // Додатково можна вивести в консоль для тесту
+            console.log('Подія відправлена для: ' + queueNumber);
+        }
+    </script>
+    <!-- End Google Tag-->
     <style>
         :root {
             --primary-color: #ffcc00;
@@ -165,18 +185,30 @@
         <p class="subtitle">Оберіть свою чергу, щоб додати автоматичний розклад у календар вашого смартфона</p>
 
         <div class="grid">
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.1.ics" class="btn">Черга 1.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.2.ics" class="btn">Черга 1.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.1.ics" class="btn">Черга 2.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.2.ics" class="btn">Черга 2.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.1.ics" class="btn">Черга 3.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.2.ics" class="btn">Черга 3.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.1.ics" class="btn">Черга 4.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.2.ics" class="btn">Черга 4.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.1.ics" class="btn">Черга 5.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.2.ics" class="btn">Черга 5.2</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.1.ics" class="btn">Черга 6.1</a>
-            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.2.ics" class="btn">Черга 6.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.1.ics" class="btn"
+                onclick="trackQueueClick('1.1')">Черга 1.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-1.2.ics" class="btn"
+                onclick="trackQueueClick('1.2')">Черга 1.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.1.ics" class="btn"
+                onclick="trackQueueClick('2.1')">Черга 2.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-2.2.ics" class="btn"
+                onclick="trackQueueClick('2.2')">Черга 2.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.1.ics" class="btn"
+                onclick="trackQueueClick('3.1')">Черга 3.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-3.2.ics" class="btn"
+                onclick="trackQueueClick('3.2')">Черга 3.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.1.ics" class="btn"
+                onclick="trackQueueClick('4.1')">Черга 4.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-4.2.ics" class="btn"
+                onclick="trackQueueClick('4.2')">Черга 4.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.1.ics" class="btn"
+                onclick="trackQueueClick('5.1')">Черга 5.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-5.2.ics" class="btn"
+                onclick="trackQueueClick('5.2')">Черга 5.2</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.1.ics" class="btn"
+                onclick="trackQueueClick('6.1')">Черга 6.1</a>
+            <a href="webcal://slevchyk.github.io/roe-parser/data/discos-6.2.ics" class="btn"
+                onclick="trackQueueClick('6.2')">Черга 6.2</a>
         </div>
 
         <div class="charity-section">
@@ -185,17 +217,19 @@
             </p>
             <div class="charity-grid">
                 <a href="https://payment-page.charge-auth.com/charity/comebackalive/LAQb27N" class="charity-item"
-                    target="_blank">
+                    onclick="trackQueueClick('Donation_ComeBackAlive')" target="_blank">
                     <img src="assets/img/come_back_alive.png" alt="Повернись Живим" class="charity-logo">
                     <span class="charity-link">Підтримати ПЖ</span>
                 </a>
 
-                <a href="https://www.sternenkofund.org/donate" class="charity-item" target="_blank">
+                <a href="https://www.sternenkofund.org/donate" class="charity-item"
+                    onclick="trackQueueClick('Donation_Sternenko')" target="_blank">
                     <img src="assets/img/sternenko.png" alt="Спільнота Стерненка" class="charity-logo">
                     <span class="charity-link">Донат на дрони</span>
                 </a>
 
-                <a href="https://prytulafoundation.org/donation" class="charity-item" target="_blank">
+                <a href="https://prytulafoundation.org/donation" class="charity-item"
+                    onclick="trackQueueClick('Donation_Prytula')" target="_blank">
                     <img src="assets/img/prytula.png" alt="Фонд Притули" class="charity-logo">
                     <span class="charity-link">Фонд Притули</span>
                 </a>
