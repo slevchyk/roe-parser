@@ -21,7 +21,7 @@ const (
 
 func main() {
 	loc, _ := time.LoadLocation("Europe/Kyiv")
-	client := &http.Client{Timeout: 15 * time.Second}
+	client := &http.Client{Timeout: 60 * time.Second}
 	req, _ := http.NewRequest("GET", SourceURL, nil)
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 
