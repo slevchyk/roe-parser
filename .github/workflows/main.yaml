@@ -1,10 +1,7 @@
-name: Update Schedule
+name: Manual Update (Backup)
 
-on:
-  schedule:
-    # Запуск кожну годину у 5-ту хвилину (напр. 10:05, 11:05)
-    - cron: '5 * * * *'
-  workflow_dispatch: # Дозволяє запускати вручну кнопкою на GitHub
+on:  
+  workflow_dispatch: # Залишили тільки ручний запуск кнопкою
 
 jobs:
   run-parser:
@@ -33,6 +30,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add discos-5.1.ics
-          git commit -m "Auto-update: $(date +'%d.%m.%Y %H:%M')" || echo "No changes to commit"
+          # Додаємо всю папку data, де тепер лежать всі 12 файлів
+          git add data/discos-*.ics
+          git commit -m "Manual update via GitHub Actions: $(date +'%d.%m.%Y %H:%M')" || echo "No changes to commit"
           git push
