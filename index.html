@@ -76,7 +76,7 @@
                     const btn = document.getElementById('modal-btn-el');
                     const originalText = btn.innerText;
                     btn.innerText = "Скопійовано!";
-                    
+
                     setTimeout(() => {
                         if (pendingCalendarUrl) {
                             window.open(pendingCalendarUrl, '_blank');
@@ -463,28 +463,24 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">&times;</span>
             <h2>Налаштування Google / Android</h2>
-            
+
             <div class="modal-step">
                 <strong>Крок 1: Підписатись на календар</strong>
                 <p>Натисність кнопку "Підписатись" нижче</p>
-                <p>Це скопіює посилання на файл у буфер обміну та відкриє сторінку додавання календаря в Google Календар.</p>
-                <p>На відкритій сторінці календаря вставте посилання в поле "За URL-адресою" та натисність "Зберегти"</p>
-                <p><i>Ось URL, який треба вставити в Google Календар, якщо з якихось причин він автоматично не скопіювався в буфер обміну:</i></p>
+                <p>Це скопіює посилання на файл у буфер обміну та відкриє сторінку додавання календаря в Google
+                    Календар.</p>
+                <p>На відкритій сторінці календаря вставте посилання в поле "За URL-адресою" та натисність "Додати
+                    календар"</p>
+                <p><i>Ось URL, який треба вставити в Google Календар, якщо з якихось причин він автоматично не
+                        скопіювався в буфер обміну:</i></p>
                 <div id="copy-url-display" class="url-box">Оберіть чергу...</div>
-                <p><i>Потім поверніться сюди і виконайте крок 2 і крок 3</i></p>
+                <p><i>Потім поверніться сюди і виконайте крок 2</i></p>
             </div>
 
             <button id="modal-btn-el" class="btn" onclick="redirectFromModal()" style="width:100%;">Підписатись</button>
 
             <div class="modal-step">
-                <strong>Крок 2: Увімкніть синхронізацію</strong>
-                <p>Перейдіть на сторінку <a href="https://calendar.google.com/calendar/syncselect"
-                        target="_blank">синхронізації</a>, поставте галочку біля щойно доданого календаря "Відключення
-                    світла: група ..." та натисніть "Зберегти".</p>
-            </div>
-
-            <div class="modal-step">
-                <strong>Крок 3: Активуйте у додатку</strong>
+                <strong>Крок 2: Активуйте у додатку</strong>
                 <p>Тепер потрібно сказати самому додатку на Android, що цей календар треба показувати:</p>
                 <ol>
                     <li>Відкрийте додаток Google Календар на Android.</li>
