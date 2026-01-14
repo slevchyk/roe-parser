@@ -2,7 +2,7 @@ name: Hourly Pages Deploy
 
 on:
   schedule:
-    - cron: '43 * * * *' # Запуск щогодини (43 хв)
+    - cron: '48 * * * *' # Запуск щогодини (48 хв)
   workflow_dispatch: # Кнопка для ручного деплою
 
 permissions:
