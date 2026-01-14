@@ -27,6 +27,7 @@
         }
 
         let pendingCalendarUrl = "";
+        let urlToCopy = "";
 
         function setPlatform(platform) {
             document.querySelectorAll('.switch-btn').forEach(b => b.classList.remove('active'));
@@ -37,14 +38,16 @@
                 const queue = btn.getAttribute('data-queue');
 
                 if (platform === 'android') {
-                    const rawUrl = `slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
-                    const googleUrl = `https://calendar.google.com/calendar/u/0/r?cid=webcal://${rawUrl}`;
+                    urlToCopy = `https://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
+                    pendingCalendarUrl = "https://calendar.google.com/calendar/u/0/r/settings/addbyurl";
 
                     btn.href = "javascript:void(0)";
                     btn.target = "_self";
                     btn.onclick = function () {
                         trackQueueClick(queue);
-                        pendingCalendarUrl = googleUrl;
+                        // Оновлюємо текст URL в модальному вікні
+                        const displayEl = document.getElementById('copy-url-display');
+                        if (displayEl) displayEl.innerText = urlToCopy;
                         showAndroidInstructions();
                     };
                 } else {
@@ -66,13 +69,26 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function redirectFromModal() {
-            if (pendingCalendarUrl) {
-                window.open(pendingCalendarUrl, '_blank');
+        async function redirectFromModal() {
+            if (urlToCopy) {
+                try {
+                    await navigator.clipboard.writeText(urlToCopy);
+                    const btn = document.getElementById('modal-btn-el');
+                    const originalText = btn.innerText;
+                    btn.innerText = "Скопійовано!";
+                    
+                    setTimeout(() => {
+                        if (pendingCalendarUrl) {
+                            window.open(pendingCalendarUrl, '_blank');
+                        }
+                        btn.innerText = originalText;
+                        document.getElementById('modal-hint-el').style.display = 'none';
+                        document.getElementById('modal-btn-el').style.display = 'none';
+                    }, 800);
+                } catch (err) {
+                    window.open(pendingCalendarUrl, '_blank');
+                }
             }
-
-            document.getElementById('modal-hint-el').style.display = 'none';
-            document.getElementById('modal-btn-el').style.display = 'none';
         }
 
         function closeModal() {
@@ -306,7 +322,6 @@
             text-align: left;
             max-height: 80vh;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .modal-content h2 {
@@ -332,6 +347,18 @@
         .modal-step p {
             margin: 5px 0 0 0;
             line-height: 1.4;
+        }
+
+        .url-box {
+            word-break: break-all;
+            background: #fff;
+            border: 1px dashed #ccc;
+            padding: 8px;
+            margin: 8px 0;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #555;
+            border-radius: 6px;
         }
 
         .close-modal {
@@ -435,19 +462,29 @@
     <div id="androidModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2>Налаштування Android</h2>
-            <p style="font-size: 0.85rem; margin-bottom: 10px;">Щоб бачити графік у додатку на телефоні <b>після</b>
-                переходу <b>Вперед</b> виконай наступні кроки:</p>
+            <h2>Налаштування Google / Android</h2>
+            
+            <div class="modal-step">
+                <strong>Крок 1: Підписатись на календар</strong>
+                <p>Натисність кнопку "Підписатись" нижче</p>
+                <p>Це скопіює посилання на файл у буфер обміну та відкриє сторінку додавання календаря в Google Календар.</p>
+                <p>На відкритій сторінці календаря вставте посилання в поле "За URL-адресою" та натисність "Зберегти"</p>
+                <p><i>Ось URL, який треба вставити в Google Календар, якщо з якихось причин він автоматично не скопіювався в буфер обміну:</i></p>
+                <div id="copy-url-display" class="url-box">Оберіть чергу...</div>
+                <p><i>Потім поверніться сюди і виконайте крок 2 і крок 3</i></p>
+            </div>
+
+            <button id="modal-btn-el" class="btn" onclick="redirectFromModal()" style="width:100%;">Підписатись</button>
 
             <div class="modal-step">
-                <strong>Крок 1: Увімкніть синхронізацію</strong>
+                <strong>Крок 2: Увімкніть синхронізацію</strong>
                 <p>Перейдіть на сторінку <a href="https://calendar.google.com/calendar/syncselect"
                         target="_blank">синхронізації</a>, поставте галочку біля щойно доданого календаря "Відключення
                     світла: група ..." та натисніть "Зберегти".</p>
             </div>
 
             <div class="modal-step">
-                <strong>Крок 2: Активуйте у додатку</strong>
+                <strong>Крок 3: Активуйте у додатку</strong>
                 <p>Тепер потрібно сказати самому додатку на Android, що цей календар треба показувати:</p>
                 <ol>
                     <li>Відкрийте додаток Google Календар на Android.</li>
@@ -462,8 +499,6 @@
 
             <div id="modal-hint-el" class="modal-hint">Поточна вкладка лишиться відкритою для перегляду інструкції.
             </div>
-
-            <button id="modal-btn-el" class="btn" onclick="redirectFromModal()" style="width:100%;">Вперед</button>
         </div>
     </div>
 </body>
