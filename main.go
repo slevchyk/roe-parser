@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	_ "time/tzdata"
 
 	"roe-parser/models"
 
