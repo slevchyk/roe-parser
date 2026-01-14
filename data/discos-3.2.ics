@@ -1,69 +1,72 @@
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//ROE-Parser//UA
-X-WR-CALNAME:Відключення світла: група 3.2
+X-WR-CALNAME:Відключення РОЕ: черга 3.2
 X-WR-TIMEZONE:Europe/Kyiv
 BEGIN:VEVENT
 UID:roe-3.2-1768341600-0408
 SUMMARY:⚡ Відключення: 3.2
-DESCRIPTION:Оновлено: 14.01.2026 11:30.\nДжерело:
+DESCRIPTION:Оновлено: 14.01.2026 14:30.\nДжерело:
   https://www.roe.vsei.ua/disconnections
 DTSTART:20260114T020000Z
 DTEND:20260114T060000Z
-DTSTAMP:20260114T093801Z
+DTSTAMP:20260114T125245Z
 BEGIN:VALARM
 ACTION:DISPLAY
 TRIGGER:-PT1H
-DESCRIPTION:Світло вимкнуть через 1 годину
-SUMMARY:Відключення світла
+DESCRIPTION:Ел. енергію вимкнуть через 1 годину
+SUMMARY:Відключення ел. енергії
 END:VALARM
 BEGIN:VALARM
 ACTION:DISPLAY
 TRIGGER:-PT30M
-DESCRIPTION:Світло вимкнуть через 30 хвилин
-SUMMARY:Відключення світла
+DESCRIPTION:Ел. енергію вимкнуть через 30
+  хвилин
+SUMMARY:Відключення ел. енергії
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:roe-3.2-1768341600-1115
 SUMMARY:⚡ Відключення: 3.2
-DESCRIPTION:Оновлено: 14.01.2026 11:30.\nДжерело:
+DESCRIPTION:Оновлено: 14.01.2026 14:30.\nДжерело:
   https://www.roe.vsei.ua/disconnections
 DTSTART:20260114T090000Z
 DTEND:20260114T130000Z
-DTSTAMP:20260114T093801Z
+DTSTAMP:20260114T125245Z
 BEGIN:VALARM
 ACTION:DISPLAY
 TRIGGER:-PT1H
-DESCRIPTION:Світло вимкнуть через 1 годину
-SUMMARY:Відключення світла
+DESCRIPTION:Ел. енергію вимкнуть через 1 годину
+SUMMARY:Відключення ел. енергії
 END:VALARM
 BEGIN:VALARM
 ACTION:DISPLAY
 TRIGGER:-PT30M
-DESCRIPTION:Світло вимкнуть через 30 хвилин
-SUMMARY:Відключення світла
+DESCRIPTION:Ел. енергію вимкнуть через 30
+  хвилин
+SUMMARY:Відключення ел. енергії
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:roe-3.2-1768341600-1822
 SUMMARY:⚡ Відключення: 3.2
-DESCRIPTION:Оновлено: 14.01.2026 11:30.\nДжерело:
+DESCRIPTION:Оновлено: 14.01.2026 14:30.\nДжерело:
   https://www.roe.vsei.ua/disconnections
 DTSTART:20260114T160000Z
 DTEND:20260114T200000Z
-DTSTAMP:20260114T093801Z
+DTSTAMP:20260114T125245Z
 BEGIN:VALARM
 ACTION:DISPLAY
 TRIGGER:-PT1H
-DESCRIPTION:Світло вимкнуть через 1 годину
-SUMMARY:Відключення світла
+DESCRIPTION:Ел. енергію вимкнуть через 1 годину
+SUMMARY:Відключення ел. енергії
 END:VALARM
 BEGIN:VALARM
 ACTION:DISPLAY
 TRIGGER:-PT30M
-DESCRIPTION:Світло вимкнуть через 30 хвилин
-SUMMARY:Відключення світла
+DESCRIPTION:Ел. енергію вимкнуть через 30
+  хвилин
+SUMMARY:Відключення ел. енергії
 END:VALARM
 END:VEVENT
 END:VCALENDAR
