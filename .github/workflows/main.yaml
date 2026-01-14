@@ -1,11 +1,14 @@
-name: Manual Update (Backup)
+name: Hourly Schedule Update
 
 concurrency:
   group: 'pages-${{ github.ref }}'
   cancel-in-progress: true
 
-on:  
-  workflow_dispatch: # Залишили тільки ручний запуск кнопкою
+on:
+  schedule:
+    # Запуск кожної години у 00 хвилин (наприклад, 10:00, 11:00 і т.д.)
+    - cron: '0 * * * *'
+  workflow_dispatch: # Залишаємо можливість ручного запуску
 
 jobs:
   run-parser:
@@ -34,7 +37,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          # Додаємо всю папку data, де тепер лежать всі 12 файлів
+          # Додаємо всю папку data, де лежать файли
           git add data/discos-*.ics
-          git commit -m "Manual update via GitHub Actions: $(date +'%d.%m.%Y %H:%M')" || echo "No changes to commit"
+          git commit -m "Scheduled update: $(date +'%d.%m.%Y %H:%M')" || echo "No changes to commit"
           git push
