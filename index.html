@@ -37,8 +37,8 @@
                 const queue = btn.getAttribute('data-queue');
 
                 if (platform === 'android') {
-                    const webcalUrl = `webcal://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
-                    const googleUrl = `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(webcalUrl)}`;
+                    const rawUrl = `slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
+                    const googleUrl = `https://calendar.google.com/calendar/u/0/r?cid=webcal://${rawUrl}`;
 
                     btn.href = "javascript:void(0)";
                     btn.target = "_self";
