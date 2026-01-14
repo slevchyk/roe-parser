@@ -38,18 +38,20 @@
                 const queue = btn.getAttribute('data-queue');
 
                 if (platform === 'android') {
-                    urlToCopy = `https://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
-                    pendingCalendarUrl = "https://calendar.google.com/calendar/u/0/r/settings/addbyurl";
-
                     btn.href = "javascript:void(0)";
                     btn.target = "_self";
-                    btn.onclick = function () {
-                        trackQueueClick(queue);
-                        // Оновлюємо текст URL в модальному вікні
-                        const displayEl = document.getElementById('copy-url-display');
-                        if (displayEl) displayEl.innerText = urlToCopy;
-                        showAndroidInstructions();
-                    };
+                    // Використовуємо окрему функцію, щоб зафіксувати значення queue
+                    btn.onclick = (function (currentQueue) {
+                        return function () {
+                            trackQueueClick(currentQueue);
+                            urlToCopy = `https://slevchyk.github.io/roe-parser/data/discos-${currentQueue}.ics`;
+                            pendingCalendarUrl = "https://calendar.google.com/calendar/u/0/r/settings/addbyurl";
+
+                            const displayEl = document.getElementById('copy-url-display');
+                            if (displayEl) displayEl.innerText = urlToCopy;
+                            showAndroidInstructions();
+                        };
+                    })(queue);
                 } else {
                     btn.href = `webcal://slevchyk.github.io/roe-parser/data/discos-${queue}.ics`;
                     btn.target = "_self";
@@ -466,15 +468,18 @@
 
             <div class="modal-step">
                 <strong>Крок 1: Підписатись на календар</strong>
-                <p>Натисність кнопку "Підписатись" нижче</p>
-                <p>Це скопіює посилання на файл у буфер обміну та відкриє сторінку додавання календаря в Google
+                <p>Натисність кнопку <b>"Підписатись"</b> нижче</p>
+                <p>Це скопіює посилання на файл та відкриє сторінку додавання календаря в Google
                     Календар.</p>
-                <p>На відкритій сторінці календаря вставте посилання в поле "За URL-адресою" та натисність "Додати
-                    календар"</p>
-                <p><i>Ось URL, який треба вставити в Google Календар, якщо з якихось причин він автоматично не
-                        скопіювався в буфер обміну:</i></p>
+                <p>На відкритій сторінці календаря вставте посилання в поле <b>"За URL-адресою"</b> та натисність <b>"Додати
+                    календар"</b></p>
+                <br>
+                <br>
+                <p><i>Потім <b>поверніться</b> сюди і виконайте <b>крок 2</b></i></p>
+                <p><i>URL, який треба вставити в Google Календар в поле "За URL-адресою", якщо з якихось причин він автоматично не
+                        скопіювався:</i></p>
                 <div id="copy-url-display" class="url-box">Оберіть чергу...</div>
-                <p><i>Потім поверніться сюди і виконайте крок 2</i></p>
+                
             </div>
 
             <button id="modal-btn-el" class="btn" onclick="redirectFromModal()" style="width:100%;">Підписатись</button>
