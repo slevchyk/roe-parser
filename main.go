@@ -56,7 +56,7 @@ func main() {
 		cal := ics.NewCalendar()
 		//cal.SetMethod(ics.MethodPublish)
 		cal.SetProductId("-//ROE-Parser//UA")
-		cal.SetXWRCalName(fmt.Sprintf("Відключення РОЕ: черга %s", id))
+		cal.SetXWRCalName(fmt.Sprintf("РОЕ. Черга: %s", id))
 		cal.SetXWRTimezone("Europe/Kyiv")
 		groups[id] = &models.WorkGroup{
 			ID:          id,
@@ -166,7 +166,7 @@ func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *tim
 		a := event.AddAlarm()
 		a.SetAction(ics.ActionDisplay)
 		a.SetTrigger(el.Trigger)
-		a.SetProperty(ics.ComponentPropertyDescription, "Ел. енергію вимкнуть через " + el.Description)
+		a.SetProperty(ics.ComponentPropertyDescription, "Ел. енергію вимкнуть через "+el.Description)
 		a.SetProperty(ics.ComponentPropertySummary, "Відключення ел. енергії")
 	}
 
