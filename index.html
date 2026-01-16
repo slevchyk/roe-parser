@@ -40,7 +40,6 @@
                 if (platform === 'android') {
                     btn.href = "javascript:void(0)";
                     btn.target = "_self";
-                    // Використовуємо окрему функцію, щоб зафіксувати значення queue
                     btn.onclick = (function (currentQueue) {
                         return function () {
                             trackQueueClick(currentQueue);
@@ -109,6 +108,62 @@
             --text-muted: #666;
             --tg-color: #229ED9;
             --vb-color: #7360f2;
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --card-bg: #1e1e1e;
+                --text-main: #e0e0e0;
+                --text-muted: #aaa;
+            }
+
+            .platform-switch {
+                background: #333 !important;
+            }
+
+            .switch-btn.active {
+                background: #444 !important;
+                color: #fff !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+            }
+
+            .charity-section {
+                background: #252525 !important;
+            }
+
+            .charity-item {
+                background: #1e1e1e !important;
+                border-color: #333 !important;
+            }
+
+            .modal-content {
+                background: #1e1e1e !important;
+                color: var(--text-main);
+            }
+
+            .modal-step {
+                background: #1a2635 !important;
+                border-left-color: var(--secondary-color) !important;
+                color: #ccc;
+            }
+
+            .url-box {
+                background: #121212 !important;
+                border-color: #444 !important;
+                color: #888 !important;
+            }
+
+            .share-section {
+                border-top-color: #333 !important;
+            }
+
+            .btn {
+                color: #000;
+            }
+
+            /* Keep button text black for contrast on yellow */
         }
 
         body {
@@ -356,7 +411,6 @@
             background: #fff;
             border: 1px dashed #ccc;
             padding: 8px;
-            margin: 8px 0;
             font-family: monospace;
             font-size: 0.7rem;
             color: #555;
@@ -469,27 +523,27 @@
             <div class="modal-step">
                 <strong>Крок 1: Підписатись на календар</strong>
                 <p>Натисність кнопку <b>"Підписатись"</b> нижче</p>
-                <p>Це скопіює посилання на файл та відкриє сторінку додавання календаря в Google
-                    Календар.</p>
-                <p>На відкритій сторінці календаря вставте посилання в поле <b>"За URL-адресою"</b> та натисність <b>"Додати
-                    календар"</b></p>
-                <br>
-                <br>
-                <p><i>Потім <b>поверніться</b> сюди і виконайте <b>крок 2</b></i></p>
-                <p><i>URL, який треба вставити в Google Календар в поле "За URL-адресою", якщо з якихось причин він автоматично не
-                        скопіювався:</i></p>
-                <div id="copy-url-display" class="url-box">Оберіть чергу...</div>
-                
+                <p>Це скопіює посилання на файл та відкриє сторінку додавання календаря в Google Календар.</p>
+                <p>На відкритій сторінці календаря вставте посилання в поле <b>"За URL-адресою"</b> та натисність
+                    <b>"Додати календар"</b>
+                </p>
             </div>
 
             <button id="modal-btn-el" class="btn" onclick="redirectFromModal()" style="width:100%;">Підписатись</button>
+
+            <div style="margin-top: 10px;">
+                <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">
+                    <i>URL для ручного копіювання (якщо не скопіювалось автоматично):</i>
+                </p>
+                <div id="copy-url-display" class="url-box">Оберіть чергу...</div>
+            </div>
 
             <div class="modal-step">
                 <strong>Крок 2: Активуйте у додатку</strong>
                 <p>Тепер потрібно сказати самому додатку на Android, що цей календар треба показувати:</p>
                 <ol>
                     <li>Відкрийте додаток Google Календар на Android.</li>
-                    <li>Натисніть на іконку "сендвіч" (три лінії) зліва зверху — відкриється бічна панель.</li>
+                    <li>Натисніть на іконку "сендвіч" (три лінії) зліва зверху.</li>
                     <li>Прокрутіть вниз і натисніть "Налаштування".</li>
                     <li>Знайдіть у списку ваш акаунт (наприклад, youraccount@gmail.com).</li>
                     <li>Під акаунтом натисніть "Показати більше".</li>
