@@ -124,7 +124,7 @@ func main() {
 		for _, cfg := range alertConfigs {
 			cal := ics.NewCalendar()
 			cal.SetProductId("-//ROE-Parser//UA")
-			cal.SetXWRCalName(fmt.Sprintf("РОЕ Гр:%s %s", g.ID, cfg.suffix))
+			cal.SetXWRCalName(fmt.Sprintf("РОЕ. Черга :%s ", g.ID))
 			cal.SetXWRTimezone("Europe/Kyiv")
 
 			eventsCreated := 0
