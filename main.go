@@ -10,13 +10,17 @@ import (
 	"time"
 	_ "time/tzdata"
 
-	"roe-parser/models"
-
 	"github.com/PuerkitoBio/goquery"
 	ics "github.com/arran4/golang-ical"
 )
 
 const SourceURL = "https://www.roe.vsei.ua/disconnections"
+
+// Допоміжна структура для збереження знайдених слотів відключень
+type OutageSlot struct {
+	Date     time.Time
+	Interval string
+}
 
 func main() {
 	loc, _ := time.LoadLocation("Europe/Kyiv")
@@ -36,41 +40,33 @@ func main() {
 		log.Fatalf("Помилка парсингу: %v", err)
 	}
 
-	// 1. Ініціалізуємо список всіх груп
-	groupIDs := []string{
-		"1.1",
-		"1.2",
-		"2.1",
-		"2.2",
-		"3.1",
-		"3.2",
-		"4.1",
-		"4.2",
-		"5.1",
-		"5.2",
-		"6.1",
-		"6.2"}
-	groups := make(map[string]*models.WorkGroup)
+	// 1. Ініціалізуємо групи та слайси для зберігання знайдених інтервалів
+	groupIDs := []string{"1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2", "5.1", "5.2", "6.1", "6.2"}
+
+	// Розширюємо вашу модель або використовуємо мапу для накопичення даних
+	type GroupData struct {
+		ID          string
+		ColumnIndex int
+		Slots       []OutageSlot
+	}
+	groups := make(map[string]*GroupData)
 
 	for _, id := range groupIDs {
-		cal := ics.NewCalendar()
-		//cal.SetMethod(ics.MethodPublish)
-		cal.SetProductId("-//ROE-Parser//UA")
-		cal.SetXWRCalName(fmt.Sprintf("РОЕ. Черга: %s", id))
-		cal.SetXWRTimezone("Europe/Kyiv")
-		groups[id] = &models.WorkGroup{
+		groups[id] = &GroupData{
 			ID:          id,
 			ColumnIndex: -1,
-			Calendar:    cal,
+			Slots:       []OutageSlot{},
 		}
 	}
 
 	// 2. Знаходимо "Оновлено: ..."
-	lastUpdate := "невідомо"
 	reUpdate := regexp.MustCompile(`Оновлено:\s+\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}`)
-	lastUpdate = reUpdate.FindString(doc.Find("body").Text())
+	lastUpdate := reUpdate.FindString(doc.Find("body").Text())
+	if lastUpdate == "" {
+		lastUpdate = "Оновлено: щойно"
+	}
 
-	// 3. Знаходимо індекси колонок для кожної групи
+	// 3. Знаходимо індекси колонок
 	doc.Find("tr").Each(func(i int, s *goquery.Selection) {
 		s.Find("td").Each(func(j int, cell *goquery.Selection) {
 			txt := strings.TrimSpace(cell.Text())
@@ -80,10 +76,14 @@ func main() {
 		})
 	})
 
-	// 4. Проходимо по рядках таблиці
+	// 4. Збираємо дані з таблиці в пам'ять
 	reDate := regexp.MustCompile(`\d{2}\.\d{2}\.\d{4}`)
 	doc.Find("tr").Each(func(i int, row *goquery.Selection) {
 		cells := row.Find("td")
+		if cells.Length() == 0 {
+			return
+		}
+
 		dateMatch := reDate.FindString(strings.TrimSpace(cells.First().Text()))
 		if dateMatch == "" {
 			return
@@ -94,7 +94,6 @@ func main() {
 			return
 		}
 
-		// Для кожної знайденої групи витягуємо дані з її колонки
 		for _, g := range groups {
 			if g.ColumnIndex == -1 || cells.Length() <= g.ColumnIndex {
 				continue
@@ -103,29 +102,56 @@ func main() {
 			cells.Eq(g.ColumnIndex).Find("p").Each(func(k int, p *goquery.Selection) {
 				interval := strings.TrimSpace(p.Text())
 				if strings.Contains(interval, "-") {
-					if addOutageEvent(g.Calendar, baseDate, interval, loc, lastUpdate, g.ID) {
-						g.EventCount++
-					}
+					g.Slots = append(g.Slots, OutageSlot{Date: baseDate, Interval: interval})
 				}
 			})
 		}
 	})
 
-	// 5. Зберігаємо всі 12 файлів
+	// 5. ГЕНЕРАЦІЯ ФАЙЛІВ
+	// Визначаємо типи сповіщень
+	alertConfigs := []struct {
+		suffix   string
+		triggers []string
+	}{
+		{suffix: "", triggers: []string{}},
+		{suffix: "-30m", triggers: []string{"-PT30M"}},
+		{suffix: "-1h", triggers: []string{"-PT1H"}},
+		{suffix: "-30m-1h", triggers: []string{"-PT30M", "-PT1H"}},
+	}
+
 	for _, g := range groups {
-		fileName := fmt.Sprintf("data/discos-%s.ics", g.ID)
-		f, err := os.Create(fileName)
-		if err != nil {
-			fmt.Printf("Помилка створення файлу %s: %v\n", fileName, err)
-			continue
+		for _, cfg := range alertConfigs {
+			cal := ics.NewCalendar()
+			cal.SetProductId("-//ROE-Parser//UA")
+			cal.SetXWRCalName(fmt.Sprintf("РОЕ Гр:%s %s", g.ID, cfg.suffix))
+			cal.SetXWRTimezone("Europe/Kyiv")
+
+			eventsCreated := 0
+			for _, slot := range g.Slots {
+				if addOutageEvent(cal, slot.Date, slot.Interval, loc, lastUpdate, g.ID, cfg.triggers) {
+					eventsCreated++
+				}
+			}
+
+			// Зберігаємо файл
+			fileName := fmt.Sprintf("data/discos-%s%s.ics", g.ID, cfg.suffix)
+			f, err := os.Create(fileName)
+			if err != nil {
+				fmt.Printf("Помилка створення %s: %v\n", fileName, err)
+				continue
+			}
+			f.WriteString(cal.Serialize())
+			f.Close()
+
+			if cfg.suffix == "" { // Виводимо лог тільки для основного файлу, щоб не спамити
+				fmt.Printf("Черга %s: %d подій згенеровано\n", g.ID, eventsCreated)
+			}
 		}
-		f.WriteString(g.Calendar.Serialize())
-		f.Close()
-		fmt.Printf("Група %s: згенеровано %d подій -> %s\n", g.ID, g.EventCount, fileName)
 	}
 }
 
-func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *time.Location, updateInfo string, groupID string) bool {
+func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *time.Location, updateInfo string, groupID string, triggers []string) bool {
 	re := regexp.MustCompile(`\s*-\s*`)
 	clean := re.ReplaceAllString(interval, "-")
 	parts := strings.Split(clean, "-")
@@ -147,27 +173,30 @@ func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *tim
 		end = time.Date(date.Year(), date.Month(), date.Day()+1, 0, 0, 0, 0, loc)
 	}
 
-	uid := fmt.Sprintf("roe-%s-%d-%02d%02d", groupID, date.Unix(), st.Hour(), et.Hour())
-	event := cal.AddEvent(uid)
+	// Додаємо суфікс тригерів до UID, щоб події були унікальними між різними календарями, якщо вони перетинаються
+	triggerID := strings.Join(triggers, "")
+	uid := fmt.Sprintf("roe-%s-%d-%02d%02d-%s", groupID, date.Unix(), st.Hour(), et.Hour(), triggerID)
 
+	event := cal.AddEvent(uid)
 	event.SetSummary("⚡ Відключення: " + groupID)
 	event.SetDescription(fmt.Sprintf("%s.\nДжерело: %s", updateInfo, SourceURL))
 	event.SetStartAt(start)
 	event.SetEndAt(end)
 	event.SetDtStampTime(time.Now())
 
-	// Нагадування
-	alarms := []models.Alarm{
-		{Trigger: "-PT1H", Description: "1 годину"},
-		{Trigger: "-PT30M", Description: "30 хвилин"},
-	}
-
-	for _, el := range alarms {
+	// Додаємо аларми згідно конфігурації
+	for _, tr := range triggers {
 		a := event.AddAlarm()
 		a.SetAction(ics.ActionDisplay)
-		a.SetTrigger(el.Trigger)
-		a.SetProperty(ics.ComponentPropertyDescription, "Ел. енергію вимкнуть через "+el.Description)
-		a.SetProperty(ics.ComponentPropertySummary, "Відключення ел. енергії")
+		a.SetTrigger(tr)
+
+		label := "30 хвилин"
+		if tr == "-PT1H" {
+			label = "1 годину"
+		}
+
+		a.SetProperty(ics.ComponentPropertyDescription, "Ел. енергію вимкнуть через "+label)
+		a.SetProperty(ics.ComponentPropertySummary, "Відключення світла")
 	}
 
 	return true
