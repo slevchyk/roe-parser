@@ -3,7 +3,7 @@
 cd /d "%~dp0"
 
 :: 1. Запуск парсера на Go
-roe-parser.exe
+start /wait "" roe-parser.exe
 
 :: 2. Перевірка чи з'явилися зміни (щоб не плодити пусті коміти)
 git status --porcelain | findstr . > nul
