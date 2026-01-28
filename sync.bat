@@ -14,3 +14,6 @@ if %errorlevel% equ 0 (
 ) else (
     echo No changes detected.
 )
+
+:: Явно виходимо з кодом 0
+exit /b 0
