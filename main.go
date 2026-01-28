@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,29 +25,29 @@ type OutageSlot struct {
 
 func main() {
 	// 1. Встановлюємо жорсткий загальний таймаут на всю роботу скрипта
-    // Якщо скрипт не впорається за 5 хвилин - він сам себе завершить
-    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-    defer cancel()
+	// Якщо скрипт не впорається за 5 хвилин - він сам себе завершить
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
 
-    loc, _ := time.LoadLocation("Europe/Kyiv")
-    
-    // Клієнт з коротким таймаутом
-    client := &http.Client{Timeout: 30 * time.Second}
-    
-    req, err := http.NewRequestWithContext(ctx, "GET", SourceURL, nil)
-    if err != nil {
-        log.Fatalf("Помилка запиту: %v", err)
-    }
-    
-    req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36")
-    req.Header.Set("Referer", "https://www.roe.vsei.ua/")
+	loc, _ := time.LoadLocation("Europe/Kyiv")
 
-    res, err := client.Do(req)
-    if err != nil {
-        log.Printf("Сайт РОЕ не відповідає: %v", err)
-        return 
-    }
-    defer res.Body.Close()
+	// Клієнт з коротким таймаутом
+	client := &http.Client{Timeout: 30 * time.Second}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", SourceURL, nil)
+	if err != nil {
+		log.Fatalf("Помилка запиту: %v", err)
+	}
+
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36")
+	req.Header.Set("Referer", "https://www.roe.vsei.ua/")
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Printf("Сайт РОЕ не відповідає: %v", err)
+		return
+	}
+	defer res.Body.Close()
 	// loc, _ := time.LoadLocation("Europe/Kyiv")
 	// client := &http.Client{Timeout: 60 * time.Second}
 	// req, _ := http.NewRequest("GET", SourceURL, nil)
