@@ -3,3 +3,4 @@ roe-parser
 *.exe
 *.dll
 cron_log.txt
+service.log
