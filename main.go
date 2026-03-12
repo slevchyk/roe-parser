@@ -6,69 +6,82 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
+
 	_ "time/tzdata"
 
 	"github.com/PuerkitoBio/goquery"
 	ics "github.com/arran4/golang-ical"
+	"golang.org/x/sys/windows/svc"
 )
 
-const SourceURL = "https://www.roe.vsei.ua/disconnections"
+const (
+	SourceURL   = "https://www.roe.vsei.ua/disconnections"
+	ServiceName = "ROEParsingService"
+)
 
-// Допоміжна структура для збереження знайдених слотів відключень
 type OutageSlot struct {
 	Date     time.Time
 	Interval string
 }
 
-func main() {
-	// 1. Встановлюємо жорсткий загальний таймаут на всю роботу скрипта
-	// Якщо скрипт не впорається за 5 хвилин - він сам себе завершить
+// Налаштування логування та робочої директорії
+func setupEnvironment() {
+	exePath, _ := os.Executable()
+	workingDir := filepath.Dir(exePath)
+	os.Chdir(workingDir)
+
+	logFile, err := os.OpenFile(filepath.Join(workingDir, "service.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err == nil {
+		log.SetOutput(logFile)
+		// Налаштовуємо прапорці логування: Дата, Час, Мікросекунди (опціонально)
+		log.SetFlags(log.Ldate | log.Ltime)
+	}
+}
+
+func runParser() {
+	// Візуальний розділювач для нового циклу
+	log.Println("")
+	log.Println("================================================================================")
+	log.Println("[INFO] ПОЧАТОК ПАРСИНГУ")
+	log.Println("--------------------------------------------------------------------------------")
+
+	os.MkdirAll("data", 0755)
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
 	loc, _ := time.LoadLocation("Europe/Kyiv")
-
-	// Клієнт з коротким таймаутом
 	client := &http.Client{Timeout: 30 * time.Second}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", SourceURL, nil)
 	if err != nil {
-		log.Fatalf("Помилка запиту: %v", err)
+		log.Printf("[ERROR] Помилка створення запиту: %v\n", err)
+		return
 	}
 
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36")
 	req.Header.Set("Referer", "https://www.roe.vsei.ua/")
 
+	log.Println("[INFO] Запит до сайту РОЕ...")
 	res, err := client.Do(req)
 	if err != nil {
-		log.Printf("Сайт РОЕ не відповідає: %v", err)
+		log.Printf("[ERROR] Сайт РОЕ не відповідає: %v\n", err)
 		return
 	}
 	defer res.Body.Close()
-	// loc, _ := time.LoadLocation("Europe/Kyiv")
-	// client := &http.Client{Timeout: 60 * time.Second}
-	// req, _ := http.NewRequest("GET", SourceURL, nil)
-	// req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36")
-	// req.Header.Set("Referer", "https://www.roe.vsei.ua/")
-
-	// res, err := client.Do(req)
-	// if err != nil {
-	// 	log.Fatalf("Помилка завантаження: %v", err)
-	// }
-	// defer res.Body.Close()
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		log.Fatalf("Помилка парсингу: %v", err)
+		log.Printf("[ERROR] Помилка обробки HTML: %v\n", err)
+		return
 	}
 
-	// 1. Ініціалізуємо групи та слайси для зберігання знайдених інтервалів
 	groupIDs := []string{"1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2", "5.1", "5.2", "6.1", "6.2"}
 
-	// Розширюємо вашу модель або використовуємо мапу для накопичення даних
 	type GroupData struct {
 		ID          string
 		ColumnIndex int
@@ -77,21 +90,17 @@ func main() {
 	groups := make(map[string]*GroupData)
 
 	for _, id := range groupIDs {
-		groups[id] = &GroupData{
-			ID:          id,
-			ColumnIndex: -1,
-			Slots:       []OutageSlot{},
-		}
+		groups[id] = &GroupData{ID: id, ColumnIndex: -1, Slots: []OutageSlot{}}
 	}
 
-	// 2. Знаходимо "Оновлено: ..."
 	reUpdate := regexp.MustCompile(`Оновлено:\s+\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}`)
 	lastUpdate := reUpdate.FindString(doc.Find("body").Text())
 	if lastUpdate == "" {
 		lastUpdate = "Оновлено: щойно"
 	}
+	log.Printf("[INFO] Статус на сайті: %s\n", lastUpdate)
 
-	// 3. Знаходимо індекси колонок
+	// Пошук індексів колонок
 	doc.Find("tr").Each(func(i int, s *goquery.Selection) {
 		s.Find("td").Each(func(j int, cell *goquery.Selection) {
 			txt := strings.TrimSpace(cell.Text())
@@ -101,48 +110,44 @@ func main() {
 		})
 	})
 
-	// 4. Збираємо дані з таблиці в пам'ять
+	// Парсинг рядків з датами
 	reDate := regexp.MustCompile(`\d{2}\.\d{2}\.\d{4}`)
+	parsedCount := 0
 	doc.Find("tr").Each(func(i int, row *goquery.Selection) {
 		cells := row.Find("td")
 		if cells.Length() == 0 {
 			return
 		}
-
 		dateMatch := reDate.FindString(strings.TrimSpace(cells.First().Text()))
 		if dateMatch == "" {
 			return
 		}
-
-		baseDate, err := time.ParseInLocation("02.01.2006", dateMatch, loc)
-		if err != nil {
-			return
-		}
+		baseDate, _ := time.ParseInLocation("02.01.2006", dateMatch, loc)
 
 		for _, g := range groups {
 			if g.ColumnIndex == -1 || cells.Length() <= g.ColumnIndex {
 				continue
 			}
-
 			cells.Eq(g.ColumnIndex).Find("p").Each(func(k int, p *goquery.Selection) {
 				interval := strings.TrimSpace(p.Text())
 				if strings.Contains(interval, "-") {
 					g.Slots = append(g.Slots, OutageSlot{Date: baseDate, Interval: interval})
+					parsedCount++
 				}
 			})
 		}
 	})
 
-	// 5. ГЕНЕРАЦІЯ ФАЙЛІВ
-	// Визначаємо типи сповіщень
+	log.Printf("[INFO] Оброблено черг: %d, знайдено слотів: %d\n", len(groups), parsedCount)
+
 	alertConfigs := []struct {
 		suffix   string
 		triggers []string
 	}{
-		{suffix: "", triggers: []string{}},
-		{suffix: "-30m", triggers: []string{"-PT30M"}},
-		{suffix: "-1h", triggers: []string{"-PT1H"}},
-		{suffix: "-30m-1h", triggers: []string{"-PT30M", "-PT1H"}},
+		{"", []string{}},
+		{"-30m", []string{"-PT30M"}},
+		{"-1h", []string{"-PT1H"}},
+		{"-30m-1h", []string{"-PT30M", "-PT1H"}},
 	}
 
 	for _, g := range groups {
@@ -152,27 +157,99 @@ func main() {
 			cal.SetXWRCalName(fmt.Sprintf("РОЕ. Черга: %s ", g.ID))
 			cal.SetXWRTimezone("Europe/Kyiv")
 
-			eventsCreated := 0
 			for _, slot := range g.Slots {
-				if addOutageEvent(cal, slot.Date, slot.Interval, loc, lastUpdate, g.ID, cfg.triggers) {
-					eventsCreated++
-				}
+				addOutageEvent(cal, slot.Date, slot.Interval, loc, lastUpdate, g.ID, cfg.triggers)
 			}
 
-			// Зберігаємо файл
-			fileName := fmt.Sprintf("data/discos-%s%s.ics", g.ID, cfg.suffix)
+			fileName := filepath.Join("data", fmt.Sprintf("discos-%s%s.ics", g.ID, cfg.suffix))
 			f, err := os.Create(fileName)
 			if err != nil {
-				fmt.Printf("Помилка створення %s: %v\n", fileName, err)
+				log.Printf("[ERROR] Не вдалося створити файл %s: %v\n", fileName, err)
 				continue
 			}
 			f.WriteString(cal.Serialize())
 			f.Close()
+		}
+	}
 
-			if cfg.suffix == "" { // Виводимо лог тільки для основного файлу, щоб не спамити
-				fmt.Printf("Черга %s: %d подій згенеровано\n", g.ID, eventsCreated)
+	log.Println("[SUCCESS] Парсинг завершено успішно.")
+	log.Println("================================================================================")
+}
+
+type myService struct{}
+
+func (m *myService) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
+	const cmdsAccepted = svc.AcceptStop | svc.AcceptShutdown
+	changes <- svc.Status{State: svc.StartPending}
+
+	stopChan := make(chan struct{})
+
+	go func() {
+		runParser()
+
+		for {
+			now := time.Now()
+			nextRun := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), 35, 0, 0, now.Location())
+
+			if !now.Before(nextRun) {
+				nextRun = nextRun.Add(time.Hour)
+			}
+
+			waitDist := time.Until(nextRun)
+			log.Printf("[SERVICE] Наступний запуск о %s (через %s)\n",
+				nextRun.Format("15:04:05"),
+				waitDist.Round(time.Second))
+
+			timer := time.NewTimer(waitDist)
+
+			select {
+			case <-timer.C:
+				runParser()
+			case <-stopChan:
+				timer.Stop()
+				return
 			}
 		}
+	}()
+
+	changes <- svc.Status{State: svc.Running, Accepts: cmdsAccepted}
+
+loop:
+	for {
+		c := <-r
+		switch c.Cmd {
+		case svc.Interrogate:
+			changes <- c.CurrentStatus
+		case svc.Stop, svc.Shutdown:
+			log.Println("[SERVICE] Отримано сигнал зупинки служби.")
+			close(stopChan)
+			break loop
+		}
+	}
+	changes <- svc.Status{State: svc.StopPending}
+	return
+}
+
+func main() {
+	setupEnvironment()
+
+	inService, err := svc.IsWindowsService()
+	if err != nil {
+		log.Fatalf("[FATAL] Помилка визначення контексту: %v\n", err)
+	}
+
+	if !inService {
+		log.Println("[INTERACTIVE] Запуск у вікні консолі...")
+		runParser()
+		fmt.Println("\nГотово. Натисніть Enter для виходу.")
+		fmt.Scanln()
+		return
+	}
+
+	log.Println("[SERVICE] Запуск служби...")
+	err = svc.Run(ServiceName, &myService{})
+	if err != nil {
+		log.Fatalf("[FATAL] Служба зупинилася з помилкою: %v\n", err)
 	}
 }
 
@@ -184,9 +261,8 @@ func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *tim
 		return false
 	}
 
-	layout := "15:04"
-	st, errS := time.ParseInLocation(layout, parts[0], loc)
-	et, errE := time.ParseInLocation(layout, parts[1], loc)
+	st, errS := time.ParseInLocation("15:04", parts[0], loc)
+	et, errE := time.ParseInLocation("15:04", parts[1], loc)
 	if errS != nil || errE != nil {
 		return false
 	}
@@ -198,10 +274,7 @@ func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *tim
 		end = time.Date(date.Year(), date.Month(), date.Day()+1, 0, 0, 0, 0, loc)
 	}
 
-	// Додаємо суфікс тригерів до UID, щоб події були унікальними між різними календарями, якщо вони перетинаються
-	triggerID := strings.Join(triggers, "")
-	uid := fmt.Sprintf("roe-%s-%d-%02d%02d-%s", groupID, date.Unix(), st.Hour(), et.Hour(), triggerID)
-
+	uid := fmt.Sprintf("roe-%s-%d-%02d%02d-%s", groupID, date.Unix(), st.Hour(), et.Hour(), strings.Join(triggers, ""))
 	event := cal.AddEvent(uid)
 	event.SetSummary("⚡ Відключення: " + groupID)
 	event.SetDescription(fmt.Sprintf("%s.\nДжерело: %s", updateInfo, SourceURL))
@@ -209,20 +282,16 @@ func addOutageEvent(cal *ics.Calendar, date time.Time, interval string, loc *tim
 	event.SetEndAt(end)
 	event.SetDtStampTime(time.Now())
 
-	// Додаємо аларми згідно конфігурації
 	for _, tr := range triggers {
 		a := event.AddAlarm()
 		a.SetAction(ics.ActionDisplay)
 		a.SetTrigger(tr)
-
 		label := "30 хвилин"
 		if tr == "-PT1H" {
 			label = "1 годину"
 		}
-
 		a.SetProperty(ics.ComponentPropertyDescription, "Ел. енергію вимкнуть через "+label)
 		a.SetProperty(ics.ComponentPropertySummary, "Відключення світла")
 	}
-
 	return true
 }

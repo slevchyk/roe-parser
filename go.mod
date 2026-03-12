@@ -1,8 +1,6 @@
 module roe-parser
 
-go 1.24.0
-
-toolchain go1.24.11
+go 1.25.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
@@ -12,4 +10,5 @@ require (
 require (
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sys v0.42.0
 )
