@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -40,6 +41,36 @@ func setupEnvironment() {
 		// Налаштовуємо прапорці логування: Дата, Час, Мікросекунди (опціонально)
 		log.SetFlags(log.Ldate | log.Ltime)
 	}
+}
+
+// Функція для автоматичного коміту та пушу в Git
+func gitCommitCalendars() {
+	log.Println("[GIT] Підготовка до оновлення репозиторію...")
+
+	// 1. Додаємо всі нові/змінені календарі з папки data
+	addCmd := exec.Command("git", "add", "data/*.ics")
+	if err := addCmd.Run(); err != nil {
+		log.Printf("[GIT-ERROR] Не вдалося додати файли: %v\n", err)
+		return
+	}
+
+	// 2. Створюємо коміт з позначкою часу
+	commitMsg := fmt.Sprintf("auto: update calendars %s", time.Now().Format("02.01 15:04"))
+	commitCmd := exec.Command("git", "commit", "-m", commitMsg)
+	if err := commitCmd.Run(); err != nil {
+		// Помилка тут часто означає, що змін немає — це нормально
+		log.Println("[GIT] Змін для коміту не знайдено.")
+		return
+	}
+
+	// 3. Відправляємо на сервер
+	pushCmd := exec.Command("git", "push")
+	if err := pushCmd.Run(); err != nil {
+		log.Printf("[GIT-ERROR] Не вдалося виконати push: %v\n", err)
+		return
+	}
+
+	log.Println("[GIT-SUCCESS] Календарі успішно синхронізовано з Git.")
 }
 
 func runParser() {
@@ -173,7 +204,8 @@ func runParser() {
 	}
 
 	log.Println("[SUCCESS] Парсинг завершено успішно.")
-	log.Println("================================================================================")
+
+	gitCommitCalendars()
 }
 
 type myService struct{}
