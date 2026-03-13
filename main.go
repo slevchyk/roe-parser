@@ -57,23 +57,24 @@ func gitCommitCalendars() {
 	exec.Command("git", "config", "--global", "--add", "safe.directory", cwd).Run()
 
 	// 3 Перед комітом підтягуємо зміни, щоб уникнути конфліктів
-	exec.Command("git", "pull", "--rebase").Run()
+	exec.Command("git", "pull", "--rebase", "origin", "main").Run()
 
-	// 3. Налаштовуємо git user (на випадок, якщо це чистий контейнер без глобальних налаштувань)
+	// 4. Налаштовуємо git user (на випадок, якщо це чистий контейнер без глобальних налаштувань)
 	exec.Command("git", "config", "user.email", "s.levchyk@gmail.com").Run()
 	exec.Command("git", "config", "user.name", "Serhii Levchyk").Run()
 
-	// 4. Перевіряємо статус (що бачить git)
+	// 5. Перевіряємо статус (що бачить git)
 	statusCmd := exec.Command("git", "status")
-	statusOut, _ := statusCmd.CombinedOutput()
-	log.Printf("[GIT] Поточний статус перед add:\n%s", string(statusOut))
-
+	statusOut, err := statusCmd.CombinedOutput()
 	if err != nil && strings.Contains(string(statusOut), "nothing to commit") {
 		log.Println("[GIT] Нових змін у календарях не виявлено (вміст ідентичний).")
 		return
 	}
 
-	// 3. Додаємо папку
+	// 6. Даємо ОС 1 секунду, щоб закрити всі дескриптори файлів
+	time.Sleep(1 * time.Second)
+
+	// 7. Додаємо папку
 	addCmd := exec.Command("git", "add", "data")
 	addOut, err := addCmd.CombinedOutput()
 	if err != nil {
@@ -81,9 +82,9 @@ func gitCommitCalendars() {
 		return
 	}
 
-	// 4. Робимо коміт
+	// 8. Робимо коміт
 	commitMsg := fmt.Sprintf("auto: update calendars %s", time.Now().Format("02.01 15:04"))
-	commitCmd := exec.Command("git", "commit", "-a", "-m", commitMsg)
+	commitCmd := exec.Command("git", "commit", "-m", commitMsg)
 	commitOut, err := commitCmd.CombinedOutput()
 
 	// Якщо Git каже, що змін немає - ми не йдемо на Push
@@ -97,7 +98,7 @@ func gitCommitCalendars() {
 
 	log.Printf("[GIT] Коміт створено: %s", string(commitOut))
 
-	// 5. Пуш
+	// 9. Пуш
 	log.Println("[GIT] Відправка на GitHub...")
 	pushOut, err := exec.Command("git", "push").CombinedOutput()
 	if err != nil {
@@ -111,7 +112,7 @@ func gitCommitCalendars() {
 func runParser() {
 	// Візуальний розділювач для нового циклу
 	log.Println("")
-	log.Println("================================================================================")
+	log.Println("=================================================================================")
 	log.Println("[INFO] ПОЧАТОК ПАРСИНГУ")
 	log.Println("--------------------------------------------------------------------------------")
 
@@ -263,6 +264,7 @@ func (m *myService) Execute(args []string, r <-chan svc.ChangeRequest, changes c
 			}
 
 			waitDist := time.Until(nextRun)
+			log.Println("--------------------------------------------------------------------------------")
 			log.Printf("[SERVICE] Наступний запуск о %s (через %s)\n",
 				nextRun.Format("15:04:05"),
 				waitDist.Round(time.Second))
@@ -288,6 +290,7 @@ loop:
 		case svc.Interrogate:
 			changes <- c.CurrentStatus
 		case svc.Stop, svc.Shutdown:
+			log.Println("--------------------------------------------------------------------------------")
 			log.Println("[SERVICE] Отримано сигнал зупинки служби.")
 			close(stopChan)
 			break loop
@@ -313,6 +316,7 @@ func main() {
 		return
 	}
 
+	log.Println("--------------------------------------------------------------------------------")
 	log.Println("[SERVICE] Запуск служби...")
 	err = svc.Run(ServiceName, &myService{})
 	if err != nil {
