@@ -45,32 +45,67 @@ func setupEnvironment() {
 
 // Функція для автоматичного коміту та пушу в Git
 func gitCommitCalendars() {
-	log.Println("[GIT] Підготовка до оновлення репозиторію...")
+	// 1. Виводимо поточну папку для контролю
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Printf("[GIT-ERROR] Не вдалося визначити робочу директорію: %v\n", err)
+		return
+	}
+	log.Printf("[GIT] Підготовка до оновлення репозиторію. Робоча директорія: %s\n", cwd)
 
-	// 1. Додаємо всі нові/змінені календарі з папки data
-	addCmd := exec.Command("git", "add", "data/*.ics")
-	if err := addCmd.Run(); err != nil {
-		log.Printf("[GIT-ERROR] Не вдалося додати файли: %v\n", err)
+	// 2.Вказуємо Git, що ця директорія безпечна (для служби)
+	exec.Command("git", "config", "--global", "--add", "safe.directory", cwd).Run()
+
+	// 3 Перед комітом підтягуємо зміни, щоб уникнути конфліктів
+	exec.Command("git", "pull", "--rebase").Run()
+
+	// 3. Налаштовуємо git user (на випадок, якщо це чистий контейнер без глобальних налаштувань)
+	exec.Command("git", "config", "user.email", "s.levchyk@gmail.com").Run()
+	exec.Command("git", "config", "user.name", "Serhii Levchyk").Run()
+
+	// 4. Перевіряємо статус (що бачить git)
+	statusCmd := exec.Command("git", "status")
+	statusOut, _ := statusCmd.CombinedOutput()
+	log.Printf("[GIT] Поточний статус перед add:\n%s", string(statusOut))
+
+	if err != nil && strings.Contains(string(statusOut), "nothing to commit") {
+		log.Println("[GIT] Нових змін у календарях не виявлено (вміст ідентичний).")
 		return
 	}
 
-	// 2. Створюємо коміт з позначкою часу
+	// 3. Додаємо папку
+	addCmd := exec.Command("git", "add", "data")
+	addOut, err := addCmd.CombinedOutput()
+	if err != nil {
+		log.Printf("[GIT-ERROR] Помилка git add: %v. Вивід: %s\n", err, string(addOut))
+		return
+	}
+
+	// 4. Робимо коміт
 	commitMsg := fmt.Sprintf("auto: update calendars %s", time.Now().Format("02.01 15:04"))
-	commitCmd := exec.Command("git", "commit", "-m", commitMsg)
-	if err := commitCmd.Run(); err != nil {
-		// Помилка тут часто означає, що змін немає — це нормально
-		log.Println("[GIT] Змін для коміту не знайдено.")
+	commitCmd := exec.Command("git", "commit", "-a", "-m", commitMsg)
+	commitOut, err := commitCmd.CombinedOutput()
+
+	// Якщо Git каже, що змін немає - ми не йдемо на Push
+	if err != nil && strings.Contains(string(commitOut), "nothing to commit") {
+		log.Println("[GIT] Нових змін у календарях не виявлено (вміст ідентичний).")
+		return
+	} else if err != nil {
+		log.Printf("[GIT-ERROR] Помилка коміту: %v. Вивід: %s\n", err, string(commitOut))
 		return
 	}
 
-	// 3. Відправляємо на сервер
-	pushCmd := exec.Command("git", "push")
-	if err := pushCmd.Run(); err != nil {
-		log.Printf("[GIT-ERROR] Не вдалося виконати push: %v\n", err)
+	log.Printf("[GIT] Коміт створено: %s", string(commitOut))
+
+	// 5. Пуш
+	log.Println("[GIT] Відправка на GitHub...")
+	pushOut, err := exec.Command("git", "push").CombinedOutput()
+	if err != nil {
+		log.Printf("[GIT-ERROR] Помилка пушу: %s\n", string(pushOut))
 		return
 	}
 
-	log.Println("[GIT-SUCCESS] Календарі успішно синхронізовано з Git.")
+	log.Println("[GIT-SUCCESS] Календарі синхронізовано з репозиторієм.")
 }
 
 func runParser() {
